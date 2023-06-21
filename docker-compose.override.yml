@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+
+  wordpress:
+    image: bu-wordpress-build
+    build: 
+      context: ./wordpress-build      
+      args:
+        GIT_USER: whennemuth
+        GIT_TOKEN_FILE: /usr/local/bin/pat
+        MANIFEST_INI_FILE: wp-manifests/devl/jaydub-bulb.ini
+        SITES: 'responsive-framework-2-x, bu-cms, bu-sustainability, bu-404-logging, bu-alert, query-monitor'
