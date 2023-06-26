@@ -40,21 +40,25 @@ RUN \
 RUN \
   apt-get -y install libapache2-mod-shib && \
   apache2ctl -M | grep mod_shib && \
-  a2enmod auth_basic headers rewrite ssl proxy proxy_http rewrite env shib
+  a2enmod auth_basic headers rewrite ssl proxy proxy_http env shib
 #   2) Copy and adjust files
 COPY shibboleth2-template.xml /etc/shibboleth/
 COPY attribute-map.xml /etc/shibboleth/
-COPY docker-entrypoint-shibboleth.sh /usr/local/bin/
-COPY wordpress.conf /etc/apache2/sites-available/
+COPY docker-entrypoint-baseline.sh /usr/local/bin/
+COPY wordpress.conf /etc/apache2/sites-enabled/
+COPY shibboleth.conf /etc/apache2/sites-available/
 RUN \
   dos2unix /etc/shibboleth/shibboleth2-template.xml && \
   dos2unix /etc/shibboleth/attribute-map.xml && \
-  dos2unix /usr/local/bin/docker-entrypoint-shibboleth.sh && \
-  dos2unix /etc/apache2/sites-available/wordpress.conf && \
+  dos2unix /usr/local/bin/docker-entrypoint-baseline.sh && \
+  dos2unix /etc/apache2/sites-enabled/wordpress.conf && \
+  dos2unix /etc/apache2/sites-available/shibboleth.conf && \
   chmod a+rw /etc/shibboleth/shibboleth2-template.xml && \
-  chmod a+rw /etc/apache2/sites-available/wordpress.conf && \
-  chmod a+x /usr/local/bin/docker-entrypoint-shibboleth.sh
+  chmod a+rw /etc/apache2/sites-enabled/wordpress.conf && \
+  chmod a+rw /etc/apache2/sites-available/shibboleth.conf && \
+  chmod a+x /usr/local/bin/docker-entrypoint-baseline.sh && \
+  rm /etc/apache2/sites-enabled/000-default.conf
 
 # Extend the entrypoint script
 RUN \
-  sed -i "/exec "$@"/i\source docker-entrypoint-shibboleth.sh \$@" /usr/local/bin/docker-entrypoint.sh
+  sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh

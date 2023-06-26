@@ -36,8 +36,6 @@ services:
       - '80:80'
     environment:
       SERVER_NAME: dev.kualitest.research.bu.edu
-      S3PROXY_HOST: s3proxy.kualitest.research.bu.edu
-      # S3PROXY_HOST=dualstack.internal-s3pro-s3pro-1ksb20endt9vw-1289646701.us-east-1.elb.amazonaws.com.
       SP_ENTITY_ID: https://*.kualitest.research.bu.edu/shibboleth
       IDP_ENTITY_ID: https://shib-test.bu.edu/idp/shibboleth
       SHIB_SP_KEY: sp-key.pem
@@ -49,7 +47,7 @@ services:
       WORDPRESS_DB_NAME: wp_db
       WORDPRESS_DEBUG: true
     volumes:
-      # - ./wordpress-baseline/sandbox/:/var/www/html/
+      - ./wordpress-baseline/sandbox/:/var/www/html/
       - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
       - ./wordpress-baseline/sp-cert.pem:/etc/shibboleth/sp-cert.pem
       - ./wordpress-baseline/logs-apache:/var/log/apache2

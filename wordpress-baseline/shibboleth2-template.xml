@@ -29,7 +29,7 @@
     	      2) See the following reference for ApplicationDefaults:
     	         https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065334379/SigningEncryption:
     --> 
-    <ApplicationDefaults entityID="SP_ENTITY_ID"
+    <ApplicationDefaults entityID="SP_ENTITY_ID_PLACEHOLDER"
                         homeURL="/"
                         REMOTE_USER="eppn buPrincipalNameID persistent-id targeted-id"
                         signing="true" 
@@ -55,7 +55,7 @@
             (Set discoveryProtocol to "WAYF" for legacy Shibboleth WAYF support.)
             You can also override entityID on /Login query string, or in RequestMap/htaccess.
             -->
-            <SSO entityID="IDP_ENTITY_ID"
+            <SSO entityID="IDP_ENTITY_ID_PLACEHOLDER"
                  discoveryProtocol="SAMLDS" discoveryURL="https://ds.example.org/DS/WAYF">
               SAML2 SAML1
             </SSO>
@@ -112,7 +112,7 @@
         <AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>
     
         <!-- Simple file-based resolver for using a single keypair. -->
-        <CredentialResolver type="File" key="SHIB_SP_KEY" certificate="SHIB_SP_CERT"/>
+        <CredentialResolver type="File" key="SHIB_SP_KEY_PLACEHOLDER" certificate="SHIB_SP_CERT_PLACEHOLDER"/>
 
         <!--
         The default settings can be overridden by creating ApplicationOverride elements (see

@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../../other_workspace/bu-wordpress-cron"
+		},
+		{
+			"path": "../apache-wordpress"
 		}
 	],
 	"settings": {}
