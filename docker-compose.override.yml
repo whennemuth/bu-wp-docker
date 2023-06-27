@@ -13,8 +13,19 @@ services:
         SITES: 'responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor'
     environment:
       S3PROXY_HOST: s3proxy.kualitest.research.bu.edu
-      # S3PROXY_HOST=dualstack.internal-s3pro-s3pro-1ksb20endt9vw-1289646701.us-east-1.elb.amazonaws.com.
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
-      # Overrided the shibboleth credentials with empty strings to skip setup of SP and authentication with the IDP.
-      # SHIB_SP_KEY: ""
-      # SHIB_SP_CERT: ""
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'DB_NAME', 'wp_db');
+        define( 'DB_USER', 'root');
+        define( 'DB_PASSWORD', '${DB_PASSWORD}');
+        define( 'DB_HOST', 'db');
+        define( 'DB_CHARSET', 'utf8');
+        define( 'DB_COLLATE', '');
+        define( 'AUTH_KEY',         '${AUTH_KEY}');
+        define( 'SECURE_AUTH_KEY',  '${SECURE_AUTH_KEY}');
+        define( 'LOGGED_IN_KEY',    '${LOGGED_IN_KEY}');
+        define( 'NONCE_KEY',        '${NONCE_KEY}');
+        define( 'AUTH_SALT',        '${AUTH_SALT}');
+        define( 'SECURE_AUTH_SALT', '${SECURE_AUTH_SALT}');
+        define( 'LOGGED_IN_SALT',   '${LOGGED_IN_SALT}');
+        define( 'NONCE_SALT',       '${NONCE_SALT}');

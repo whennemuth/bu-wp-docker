@@ -26,8 +26,10 @@ COPY docker-entrypoint-build.sh /usr/local/bin/
 COPY s3proxy.conf /etc/apache2/sites-available/
 
 RUN \
-  dos2unix /usr/local/bin/docker-entrypoint-build.sh
+  dos2unix /usr/local/bin/docker-entrypoint-build.sh && \
+  chmod a+r /usr/src/wordpress/healthcheck.htm
 
 # Extend the entrypoint script
 RUN \
   sed -i "/exec "$@"/i\source docker-entrypoint-build.sh \$@" /usr/local/bin/docker-entrypoint.sh
+
