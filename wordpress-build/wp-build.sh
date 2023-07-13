@@ -1,10 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
 WORKSPACE=${1:-"/tmp"}
-MANIFEST_DIR="wp-manifests"
+MANIFEST_DIRNAME="wp-manifests"
+REPO_TARGET_DIR="${WORKSPACE}/repos"
 
 # Declare an associative array to contain the information for a single site (AKA, a "section") in the .ini file.
 declare -A section=()
 
+# Url encode a string to account for invalid characters.
 urlencode() { (xxd -plain | tr -d '\n' | sed 's/\(..\)/%\1/g') < /dev/stdin; }
 # Get the topmost directory in a path, ie: "usr" in "/usr/local/bin"
 topname() { (rev | (basename "$(</dev/stdin)") | rev) < /dev/stdin; }
@@ -16,18 +19,18 @@ trim() {
 }
 
 # Example MANIFEST_INI_FILE: wp-manifests/devl/jaydub-bulb.ini
-if [ "$(echo $MANIFEST_INI_FILE | topname)" == $MANIFEST_DIR ] ; then
+if [ "$(echo $MANIFEST_INI_FILE | topname)" == $MANIFEST_DIRNAME ] ; then
   inifile="${WORKSPACE}/${MANIFEST_INI_FILE}"
 else
-  inifile="${WORKSPACE}/${MANIFEST_DIR}/${MANIFEST_INI_FILE}"
+  inifile="${WORKSPACE}/${MANIFEST_DIRNAME}/${MANIFEST_INI_FILE}"
 fi
 
-# Pull a wordpress site from github and extract its content to the wp-content directory
+# Pull a wordpress repo from github and extract its content to the wp-content directory
 pullContentRepo() {
   local repo_dir="${WORKSPACE}/$1"
+  local target_dir="${REPO_TARGET_DIR}/${section['dest']}"
   local token="$(cat "$GIT_TOKEN_FILE" | urlencode)"
   local repo="$(echo ${section['source']} | cut -d'@' -f2 | cut -d'@' -f2 | sed 's|:|/|')"
-  local target_dir="/usr/src/wordpress/${section['dest']}"
   echo "Pulling ${repo}..."
   rm -rf $repo_dir 2> /dev/null || true
   mkdir $repo_dir
@@ -43,7 +46,7 @@ pullContentRepo() {
 
 # Pull the manifest repo from github.
 pullManifestRepo() {
-  local repo_dir="${WORKSPACE}/${MANIFEST_DIR}"
+  local repo_dir="${WORKSPACE}/${MANIFEST_DIRNAME}"
   local token="$(cat "$GIT_TOKEN_FILE" | urlencode)"
   echo "Pulling github.com/bu-ist/wp-manifests.git..."
   rm -rf $repo_dir 2> /dev/null || true
@@ -58,7 +61,7 @@ pullManifestRepo() {
 
 # Load a single section, identified by section name, from the specified .ini file.
 # What gets loaded is about 6 lines from the ini file that contain all information needed to pull the specific
-# content from a github repo bound for the wp-content directory for the site identified by the section name.
+# content from a github repo bound for the wp-content directory for the repo identified by the section name.
 loadSection() {
   local section_name="$1"
   local first_line='true'
@@ -85,9 +88,9 @@ printSection() {
   done
 }
 
-# Pull a single "site" from github and extract its content to the wp-content directory.
-processSingleSite() {
-  local site="$1"
+# Pull a single "repo" from github and extract its content to the wp-content directory.
+processSingleRepo() {
+  local repo="$1"
   
   # Only git repos are supported for now.
   [ "${section['scm']}" != 'git' ] && echo "Not a git repo: ${section['name']}" && return 0
@@ -95,16 +98,16 @@ processSingleSite() {
   pullContentRepo "${section['name']}"
 }
 
-# For each site in SITES, pull from the corresponding git repo and extract its content to the wp-content directory.
+# For each repos in REPOS, pull from the corresponding git repo and extract its content to the wp-content directory.
 processIniFile() {
-  # SITES is a comma-delimited single line string. Iterate over each delimited value (site).
-  for site in $(echo "$SITES" | awk 'BEGIN{RS = ","}{print $1}') ; do
+  # REPOS is a comma-delimited single line string. Iterate over each delimited value (repo).
+  for repo in $(echo "$REPOS" | awk 'BEGIN{RS = ","}{print $1}') ; do
 
-    echo "Processing ${site}..."
+    echo "Processing ${repo}..."
 
-    loadSection $site
+    loadSection $repo
 
-    processSingleSite  $site
+    processSingleRepo  $repo
   done
 }
 

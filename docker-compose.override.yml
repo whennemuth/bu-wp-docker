@@ -10,22 +10,13 @@ services:
         GIT_USER: whennemuth
         GIT_TOKEN_FILE: /usr/local/bin/pat
         MANIFEST_INI_FILE: wp-manifests/devl/jaydub-bulb.ini
-        SITES: 'responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor'
+        REPOS: 'responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor'
     environment:
       S3PROXY_HOST: s3proxy.kualitest.research.bu.edu
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
+      DB_NAME: wb_db
+      DB_USER: root
+      DB_HOST: db
+      DB_CHARSET: utf8
       WORDPRESS_CONFIG_EXTRA: |
-        define( 'DB_NAME', 'wp_db');
-        define( 'DB_USER', 'root');
         define( 'DB_PASSWORD', '${DB_PASSWORD}');
-        define( 'DB_HOST', 'db');
-        define( 'DB_CHARSET', 'utf8');
-        define( 'DB_COLLATE', '');
-        define( 'AUTH_KEY',         '${AUTH_KEY}');
-        define( 'SECURE_AUTH_KEY',  '${SECURE_AUTH_KEY}');
-        define( 'LOGGED_IN_KEY',    '${LOGGED_IN_KEY}');
-        define( 'NONCE_KEY',        '${NONCE_KEY}');
-        define( 'AUTH_SALT',        '${AUTH_SALT}');
-        define( 'SECURE_AUTH_SALT', '${SECURE_AUTH_SALT}');
-        define( 'LOGGED_IN_SALT',   '${LOGGED_IN_SALT}');
-        define( 'NONCE_SALT',       '${NONCE_SALT}');

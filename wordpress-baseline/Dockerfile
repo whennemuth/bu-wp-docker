@@ -42,24 +42,13 @@ RUN \
   apache2ctl -M | grep mod_shib && \
   a2enmod auth_basic headers rewrite ssl proxy proxy_http env shib
 #   2) Copy and adjust files
-COPY shibboleth2-template.xml /etc/shibboleth/
-COPY attribute-map.xml /etc/shibboleth/
-COPY docker-entrypoint-baseline.sh /usr/local/bin/
-COPY wordpress.conf /etc/apache2/sites-enabled/
-COPY shibboleth.conf /etc/apache2/sites-available/
-COPY healthcheck.htm /usr/src/wordpress/
-RUN \
-  dos2unix /etc/shibboleth/shibboleth2-template.xml && \
-  dos2unix /etc/shibboleth/attribute-map.xml && \
-  dos2unix /usr/local/bin/docker-entrypoint-baseline.sh && \
-  dos2unix /etc/apache2/sites-enabled/wordpress.conf && \
-  dos2unix /etc/apache2/sites-available/shibboleth.conf && \
-  chmod a+rw /etc/shibboleth/shibboleth2-template.xml && \
-  chmod a+rw /etc/apache2/sites-enabled/wordpress.conf && \
-  chmod a+rw /etc/apache2/sites-available/shibboleth.conf && \
-  chmod a+x /usr/local/bin/docker-entrypoint-baseline.sh && \
-  chmod a+r /usr/src/wordpress/healthcheck.htm && \
-  rm /etc/apache2/sites-enabled/000-default.conf
+COPY --chmod=766 shibboleth2-template.xml /etc/shibboleth/
+COPY --chmod=766 attribute-map.xml /etc/shibboleth/
+COPY --chmod=777 docker-entrypoint-baseline.sh /usr/local/bin/
+COPY --chmod=766 wordpress.conf /etc/apache2/sites-enabled/
+COPY --chmod=766 shibboleth.conf /etc/apache2/sites-available/
+COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
+RUN rm /etc/apache2/sites-enabled/000-default.conf
 
 # Extend the entrypoint script
 RUN \

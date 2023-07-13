@@ -47,13 +47,13 @@ This build is based on the standard docker image for WordPress, version 5.4.2 wi
 
       which is located [here](https://github.com/bu-ist/wp-manifests/blob/master/devl/jaydub-bulb.ini)
 
-   4. **SITES:** This is a comma-delimited list of git repositories from the .ini file that are to be built into the wordpress installation of the image. *(An option for "all" repositories is not yet available, but will be coming)*. Example:
+   4. **REPOS:** This is a comma-delimited list of git repositories from the .ini file that are to be built into the wordpress installation of the image. *(An option for "all" repositories is not yet available, but will be coming)*. Example:
 
       ```
       responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor
       ```
 
-   Next, build the image itself:
+   Next, build the image itself *(be in the root directory of the repo)*:
 
    ```
    docker compose build --no-cache wordpress
