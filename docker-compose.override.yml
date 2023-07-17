@@ -14,9 +14,5 @@ services:
     environment:
       S3PROXY_HOST: s3proxy.kualitest.research.bu.edu
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
-      DB_NAME: wb_db
-      DB_USER: root
-      DB_HOST: db
-      DB_CHARSET: utf8
       WORDPRESS_CONFIG_EXTRA: |
-        define( 'DB_PASSWORD', '${DB_PASSWORD}');
+        define( 'S3_UPLOADS_BUCKET', '${S3_UPLOADS_BUCKET}');
