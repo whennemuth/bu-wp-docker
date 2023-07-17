@@ -16,3 +16,7 @@ services:
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
       WORDPRESS_CONFIG_EXTRA: |
         define( 'S3_UPLOADS_BUCKET', '${S3_UPLOADS_BUCKET}');
+        define( 'S3_UPLOADS_REGION', '${S3_UPLOADS_REGION}');
+        define( 'S3_UPLOADS_KEY', '${S3_UPLOADS_KEY}');
+        define( 'S3_UPLOADS_SECRET', '${S3_UPLOADS_SECRET}');
+        define( 'ACCESS_RULES_TABLE', '${ACCESS_RULES_TABLE}');
