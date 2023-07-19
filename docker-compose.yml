@@ -1,61 +1,31 @@
-version: '3.1'
+version: '3.9'
 
 services:
 
   db:
-    build: ./mysql
-    restart: always
-    container_name: mysql
-    ports:
-      - 3306:3306
-    volumes:
-      - ./mysql/persisted_data:/bitnami/mysql/data
-    environment:
-      MYSQL_DATABASE: wp_db
-      MYSQL_ROOT_PASSWORD: password
-    networks:
-      wp-bridge:
-
-  adminer:
-    image: adminer
-    container_name: adminer
-    restart: always
-    ports:
-      - 8000:8080
-    networks:
-      wp-bridge:
+    extends:
+      file: compose-baseline.yml
+      service: db
 
   wordpress:
-    build: ./wordpress-baseline
-    image: bu-wordpress-baseline
-    container_name: wordpress
-    restart: always
-    hostname: dev.kualitest.research.bu.edu
-    ports:
-      - '443:443'
-      - '80:80'
+    extends:
+      file: compose-baseline.yml
+      service: wordpress
+    image: ${DOCKER_REGISTRY}/bu-wordpress-build 
+    build: 
+      context: ./wordpress-build      
+      args:
+        BASE_IMAGE: ${DOCKER_REGISTRY}/bu-wordpress-baseline
+        GIT_USER: ${GIT_USER}
+        GIT_PAT: ${GIT_PAT}
+        MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
+        REPOS: ${REPOS}
     environment:
-      SERVER_NAME: dev.kualitest.research.bu.edu
-      SP_ENTITY_ID: https://*.kualitest.research.bu.edu/shibboleth
-      IDP_ENTITY_ID: https://shib-test.bu.edu/idp/shibboleth
-      SHIB_SP_KEY: sp-key.pem
-      SHIB_SP_CERT: sp-cert.pem
-      TZ: America/New_York
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: root
-      WORDPRESS_DB_PASSWORD: password
-      WORDPRESS_DB_NAME: wp_db
-      WORDPRESS_DEBUG: true
-    volumes:
-      - ./wordpress-baseline/sandbox/:/var/www/html/
-      - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
-      - ./wordpress-baseline/sp-cert.pem:/etc/shibboleth/sp-cert.pem
-      - ./wordpress-baseline/logs-apache:/var/log/apache2
-      - ./wordpress-baseline/logs-shib:/var/log/shibboleth
-    networks:
-      wp-bridge:
+      S3PROXY_HOST: https://s3proxy.kualitest.research.bu.edu/
+      FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'ACCESS_RULES_TABLE', '${ACCESS_RULES_TABLE}');
 
 networks:
   wp-bridge:
     driver: bridge
-

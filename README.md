@@ -19,13 +19,27 @@ This build is based on the standard docker image for WordPress, version 5.4.2 wi
 
 ### Steps:
 
-1. Build the baseline image:
+1. Create a `.env` file at the root of the project. Insert values image build args.
+   Example file content *(Modify the values as directed in later sections):*
 
    ```
-   cd wordpress-baseline
-   docker build -t bu-wordpress-baseline .
+   # ----------------------------------------
+   #          Build Args:
+   # ----------------------------------------
+   DOCKER_REGISTRY=770203350335.dkr.ecr.us-east-1.amazonaws.com
+   GIT_USER=BUWebTeam
+   GIT_PAT=[value]
+   MANIFEST_INI_FILE=wp-manifests/devl/jaydub-bulb.ini
+   REPOS='akismet, responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor'
    ```
 
+1. Build the baseline image
+
+   ```
+   docker compose -f compose-baseline.yml build --no-cache wordpress
+   ```
+   
+You may want to edit the name assigned to the image in `docker-compose.yml` to indicate a different registry.
    Cleanup if working on the image and doing multiple builds;
 
    ```
@@ -33,40 +47,52 @@ This build is based on the standard docker image for WordPress, version 5.4.2 wi
    ```
 
 2. Build the "build" image:
-   The wordpress installation is built as part of the docker image build. Before building, modify the following `wordpress.build.args` entries in the `docker-compose.override.yml` file:
+   The wordpress installation is built as part of the docker image build. Before building, modify the following `.env` file entries:
+
+   1. **DOCKER_REGISTRY:** Will be used to form part of image names, IE: `"770203350335.dkr.ecr.us-east-1.amazonaws.com"`
 
    1. **GIT_USER**: A git user that is part of the bu-ist organization and who has access to the [git manifests repository](https://github.com/bu-ist/wp-manifests/tree/master) and all git repositories specified in the ini configuration files stored there.
 
-   2. **GIT_TOKEN_FILE**: Don't change this value: *`"(/usr/local/bin/pat)"`*. It is assumed that the git user will authenticate with a [personal access token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). Save the PAT in a file called "pat" in the `wordpress-build` subdirectory. It will be copied into a discarded stage of a multistage docker build. This is a temporary method for git repo access - a key-based approach may supplant this later.
-
-   3. **MANIFEST_INI_FILE**: This is currently not a [multisite](https://wordpress.org/documentation/article/wordpress-glossary/#multisite) build, so you must select a single site and environment to build from. So, for example, if your website is "jaydub-bulb" and the environment is "devl", then you would set this value to:
-
+   3. **GIT_PAT**: It is assumed that the git user will authenticate with a [personal access token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). Put this into the `.env` file at the root of the project.
+      *(SEE: [Running locally](./docs/run-locally.md) for more on what goes into the `.env` file).*
+   
+   4. **MANIFEST_INI_FILE**: This is currently a single manifest build, so you must select one environment/website combination to build from. So, for example, if your website is "jaydub-bulb" and the environment is "devl", then you would set this value to:
+   
       ```
       wp-manifests/devl/jaydub-bulb.ini
       ```
-
+   
       which is located [here](https://github.com/bu-ist/wp-manifests/blob/master/devl/jaydub-bulb.ini)
-
+   
    4. **REPOS:** This is a comma-delimited list of git repositories from the .ini file that are to be built into the wordpress installation of the image. *(An option for "all" repositories is not yet available, but will be coming)*. Example:
-
+   
       ```
       responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor
       ```
-
+      
+   6. TODO: Say something about [multisite](https://wordpress.org/documentation/article/wordpress-glossary/#multisite)?
+   
    Next, build the image itself *(be in the root directory of the repo)*:
-
+   
    ```
    docker compose build --no-cache wordpress
    ```
-
+   
 3. Publish the image:
    Put the built image into the BU public registry so it is available to ECS stacks.
    
    ```
-   docker tag bu-wordpress-build 770203350335.dkr.ecr.us-east-1.amazonaws.com/cms-devl:jaydub-bulb
+   # Retag if necessary
+   docker tag \
+     770203350335.dkr.ecr.us-east-1.amazonaws.com/bu-wordpress-build \
+     770203350335.dkr.ecr.us-east-1.amazonaws.com/cms-devl:jaydub-bulb
+   
+   # Login to the registry
    aws ecr get-login-password --region us-east-1 | \
    	docker login --username AWS --password-stdin 770203350335.dkr.ecr.us-east-1.amazonaws.com
-   docker push 770203350335.dkr.ecr.us-east-1.amazonaws.com/wrhtest:jaydub-bulb
+   
+   # Push the image
+   docker push 770203350335.dkr.ecr.us-east-1.amazonaws.com/cms-devl:jaydub-bulb
    ```
    
 4. *[Optional]* Run the WordPress installation locally:

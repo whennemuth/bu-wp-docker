@@ -8,4 +8,4 @@ USER 1001
 
 COPY ./memory-reduction.cnf /opt/bitnami/mysql/conf/memory-reduction.cnf
 
-COPY ./populate.sh /usr/local/bin/populate.sh
+# COPY ./populate.sh /usr/local/bin/populate.sh

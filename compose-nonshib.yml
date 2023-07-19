@@ -1,0 +1,29 @@
+# Use this compose file to keep shibboleth out of the picture.
+# NOTE: If using docker compose v3, you can use the reset value:
+#   https://docs.docker.com/compose/compose-file/13-merge/#reset-value
+#
+# USAGE:
+#
+# docker compose -f compose-nonshib.yml up -dversion: '3.9'
+
+services:
+
+  db:
+    extends:
+      file: compose-baseline.yml
+      service: db
+
+  wordpress:
+    extends:
+      file: compose-baseline.yml
+      service: wordpress
+    environment:
+      SHIB_SP_KEY: ""
+      SHIB_SP_CERT: ""
+    volumes: 
+      - ./wordpress-baseline/sp-key.pem:
+      - ./wordpress-baseline/sp-cert.pem:
+
+networks:
+  wp-bridge:
+    driver: bridge

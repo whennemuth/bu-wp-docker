@@ -1,10 +1,5 @@
 FROM wordpress:5.4.2-php7.4-apache
 
-# Override this to get a cache miss and force rebuild from scratch
-# Example: docker build -t bu-wordpress-baseline --build-arg $(date +'%F-%T') .
-ARG CACHE_DATE
-ENV CACHE_DATE=${CACHE_DATE:-"2023-06-08-00:00:00"}
-
 # Client utils & tools
 RUN \
   apt update && apt upgrade; \
