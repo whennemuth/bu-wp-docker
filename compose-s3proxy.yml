@@ -11,8 +11,6 @@ services:
     image: public.ecr.aws/bostonuniversity-nonprod/aws-sigv4-proxy
     container_name: s3proxy
     restart: always
-    ports:
-      - 8000:8080
     command: 
       - "-v"
       - "--name"
