@@ -15,7 +15,7 @@ services:
     build: 
       context: ./wordpress-build      
       args:
-        BASE_IMAGE: ${DOCKER_REGISTRY}/bu-wordpress-baseline
+        DOCKER_REGISTRY: ${DOCKER_REGISTRY}
         GIT_USER: ${GIT_USER}
         GIT_PAT: ${GIT_PAT}
         MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
