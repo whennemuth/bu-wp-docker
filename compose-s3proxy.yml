@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+
+  db:
+    extends:
+      file: docker-compose.yml
+      service: db
+
+  s3proxy:
+    image: public.ecr.aws/bostonuniversity-nonprod/aws-sigv4-proxy
+    container_name: s3proxy
+    restart: always
+    command: 
+      - "-v"
+      - "--name"
+      - "s3-object-lambda"
+      - "--host ${OLAP}-${OLAP_ACCT_NBR}.s3-object-lambda.${OLAP_REGION}.amazonaws.com"
+      - "--region ${OLAP_REGION}"
+      - "--no-verify-ssl"
+    environment:
+      - healthcheck_path: '/s3proxy-healthcheck'
+    secrets:
+      - AWS_ACCESS_KEY_ID: ${S3_UPLOADS_SECRET}
+      - AWS_SECRET_ACCESS_KEY: ${S3_UPLOADS_KEY}
+      - AWS_REGION: ${S3_UPLOADS_REGION}
+    networks:
+      wp-bridge:
+
+  wordpress:
+    extends:
+      file: docker-compose.yml
+      service: wordpress
+    environment:
+      S3PROXY_HOST: wp-bridge:8080/
+
+networks:
+  wp-bridge:
+    driver: bridge

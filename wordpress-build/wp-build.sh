@@ -25,11 +25,24 @@ else
   inifile="${WORKSPACE}/${MANIFEST_DIRNAME}/${MANIFEST_INI_FILE}"
 fi
 
+# Pull the manifest repo from github.
+pullManifestRepo() {
+  local repo_dir="${WORKSPACE}/${MANIFEST_DIRNAME}"
+  echo "Pulling github.com/bu-ist/wp-manifests.git..."
+  rm -rf $repo_dir 2> /dev/null || true
+  mkdir $repo_dir
+  (
+    cd $repo_dir
+    git init
+    git remote add origin https://${GIT_USER}:${GIT_PAT}@github.com/bu-ist/wp-manifests.git
+    git pull --depth 1 origin master
+  )
+}
+
 # Pull a wordpress repo from github and extract its content to the wp-content directory
-pullContentRepo() {
+pullGitRepo() {
   local repo_dir="${WORKSPACE}/$1"
   local target_dir="${REPO_TARGET_DIR}/${section['dest']}"
-  local token="$(cat "$GIT_TOKEN_FILE" | urlencode)"
   local repo="$(echo ${section['source']} | cut -d'@' -f2 | cut -d'@' -f2 | sed 's|:|/|')"
   echo "Pulling ${repo}..."
   rm -rf $repo_dir 2> /dev/null || true
@@ -38,26 +51,60 @@ pullContentRepo() {
   (
     cd $repo_dir
     git init
-    git remote add origin https://${GIT_USER}:${token}@${repo}
+    git remote add origin https://${GIT_USER}:${GIT_PAT}@${repo}
     git fetch --depth 1 origin ${section['rev']}
     git archive --format=tar FETCH_HEAD | (cd $target_dir && tar xf -)
   )
 }
 
-# Pull the manifest repo from github.
-pullManifestRepo() {
-  local repo_dir="${WORKSPACE}/${MANIFEST_DIRNAME}"
-  local token="$(cat "$GIT_TOKEN_FILE" | urlencode)"
-  echo "Pulling github.com/bu-ist/wp-manifests.git..."
+pullSvnRepo() {
+  local repo_dir="${WORKSPACE}/$1"
+  export target_dir="${REPO_TARGET_DIR}/${section['dest']}"
+  local repo="${section['source']}?p=${section['rev']}"
+  echo "Pulling ${repo}..."
   rm -rf $repo_dir 2> /dev/null || true
   mkdir $repo_dir
+  [ ! -d $target_dir ] && mkdir -p $target_dir
+
+  # Get the portion of the http address that has the protocol, domain, and any trailing "/" removed.
+  # Example: "https://plugins.svn.wordpress.org/akismet/tags/4.1.10/" becomes "akismet/tags/4.1.10"
+  local path=$(echo ${section['source']} \
+    | awk 'BEGIN {RS="/"} {if($1 != "") { if(NR>1) printf "\n"; printf $1}}' \
+    | tail -n +3 \
+    | tr '\n' '/')
+
+  # Get the domain portion of the http address
+  # Example: "https://plugins.svn.wordpress.org/akismet/tags/4.1.10/" becomes "plugins.svn.wordpress.org"
+  local domain=$(echo ${section['source']} \
+    | awk 'BEGIN {RS="/"} {if($1 != "") print $1}' \
+    | sed -n '2 p')
+
+  # "Pull" just the revision
+  wget -r $repo --accept-regex=.*/${path}/.*
+
+  # Copy the content of the downloaded svn repo to the target directory.
+  # The querystring portion of the revision is retained by wget on the end of the file names, so also strip these off while copying.
+  function copyAndFilterSvnRepo() {
+    local src="$1"
+    if [ -d $src ] ; then
+      mkdir -p $target_dir/$src
+    else
+      [ "${src:0:2}" == './' ] && src=${src:2}
+      # local exclude="?p=${section['rev']}"
+      # local $target=$(echo $src | sed 's/'${exclude}'//')
+      local dest=${target_dir}/$(echo $src | cut -d'?' -f1)
+      cp $src $dest
+    fi
+  }
+  export -f copyAndFilterSvnRepo
+
   (
-    cd $repo_dir
-    git init
-    git remote add origin https://${GIT_USER}:${token}@github.com/bu-ist/wp-manifests.git
-    git pull --depth 1 origin master
+    cd ${domain}/${path}
+    find . -exec bash -c "copyAndFilterSvnRepo \"{}\"" \;
   )
 }
+
+
 
 # Load a single section, identified by section name, from the specified .ini file.
 # What gets loaded is about 6 lines from the ini file that contain all information needed to pull the specific
@@ -73,9 +120,11 @@ loadSection() {
       section["name"]="$(echo $line | grep -oP '[^\[\]]+' | trim)"
       first_line='false'
     else
-      local fld="$(echo $line | cut -d'=' -f1 | trim)"
-      local val="$(echo $line | cut -d'=' -f2 | trim)"
-      section["$fld"]="$val"
+      if [ -n "$(echo $line | trim)" ] ; then
+        local fld="$(echo $line | cut -d'=' -f1 | trim)"
+        local val="$(echo $line | cut -d'=' -f2 | trim)"
+        section["$fld"]="$val"
+      fi
     fi    
     first_line='false'
   done <<< $(cat $inifile | grep -A 6 -iP '^\s*\[\s*'${section_name}'\s*\]\s*$')
@@ -92,10 +141,14 @@ printSection() {
 processSingleRepo() {
   local repo="$1"
   
-  # Only git repos are supported for now.
-  [ "${section['scm']}" != 'git' ] && echo "Not a git repo: ${section['name']}" && return 0
-    
-  pullContentRepo "${section['name']}"
+  case "${section['scm']}" in
+    git) 
+      pullGitRepo "${section['name']}" ;;
+    svn)
+      pullSvnRepo "${section['name']}" ;;
+    default)
+      echo "Unknown repo type: ${section['name']}" ;;
+  esac
 }
 
 # For each repos in REPOS, pull from the corresponding git repo and extract its content to the wp-content directory.
@@ -118,7 +171,5 @@ build() {
 
   processIniFile
 }
-
-env
 
 build

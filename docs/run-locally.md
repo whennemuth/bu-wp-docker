@@ -22,39 +22,50 @@
 
 4. Modify the environment section in the `"docker-compose-override.yml"` file.
 
-   - **S3PROXY_HOST**: This is the publicly addressable host name for a sigv4 signing service stack in aws. It is what apache will target for requests to retrieve assets like images and files (stored in an s3 bucket).
+   - **S3PROXY_HOST**: This is the publicly addressable host name for a sigv4 signing service stack in aws, or alternatively the docker-compose network bridge and port for an s3proxy service container running as a sidecar. It is what apache will target for requests to retrieve assets like images and files (stored in an s3 bucket).  Examples: `https://s3proxy.kualitest.research.bu.edu/` or `wp_bridge:8080/`
    - **FORWARDED_FOR_HOST:** Include this value to indicate the container is NOT for a multisite wordpress installation. Set it to the value of the single site that wordpress will host. It is this value that will be issued as the `"X-Forwarded-Host"` header value in http requests proxied to the s3 object lambda access point for assets by apache. Example: `"jaydub-bulb.cms-devl.bu.edu"`*(NOTE: Multisite not currently supported, coming soon)*.
 
-5. Create a `.env` file with secrets:
-   The secrets placed in this file are passed into the container through the `WORDPRESS_CONFIG_EXTRA` environment variable *(SEE: ["Inject configuration using environment variable #142"](https://github.com/docker-library/wordpress/pull/142))*. This file should be placed at the root of the project and contain the following with actual values inserted:
+5. Add the following entries to the [`.env`](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) file at the root of the project with secrets and environment variables for the container:
+   The values placed in this file are passed into the container through environment variables, including `WORDPRESS_CONFIG_EXTRA`  *(SEE: ["Inject configuration using environment variable #142"](https://github.com/docker-library/wordpress/pull/142)):
 
    ```
+   # ----------------------------------------
+   #     Runtime Env vars and secrets:
+   # ----------------------------------------
    # For windows users
    COMPOSE_CONVERT_WINDOWS_PATHS=true
    
-   # Mysql db creds
-   DB_PASSWORD=[value]
+   # Database password (defaults to "password")
+   WORDPRESS_DB_PASSWORD=[value]
    
-   # Wordpress Authentication Unique Keys and Salts
-   AUTH_KEY=[value]
-   SECURE_AUTH_KEY=[value]
-   LOGGED_IN_KEY=[value]
-   NONCE_KEY=[value]
-   AUTH_SALT=[value]
-   SECURE_AUTH_SALT=[value]
-   LOGGED_IN_SALT=[value]
-   NONCE_SALT=[value]
+   # Object lambda access point (OLAP) details for s3 proxying
+   OLAP=wordpress-protected-s3-assets-jaydub-olap
+   OLAP_ACCT_NBR=770203350335
+   OLAP_REGION=us-east-1
+   
+   # Credentials for OLAP access
+   S3_UPLOADS_REGION=us-east-1
+   S3_UPLOADS_KEY=[value]
+   S3_UPLOADS_SECRET=[value]
+   
+   # miscellaneous
+   ACCESS_RULES_TABLE=[value]
    
    ```
-
+   
 6. Run the application:
 
    ```
+   # Assumes a cloud-based s3 proxy sigv4 signing service:
    docker compose up -d
+   
+   # Add a local container for the s3 proxy sigv4 signing service:
+   docker compose -f compose-s3proxy.yml up -d
    ```
 
    Visit the admin page at the server name specified earlier, IE: https://dev.kualitest.research.bu.edu/wp-admin/
    Your first browser visit should trigger the wordpress wp-config completion questions.
    You will be asked to supply the database connection details and your default site name.
-
+   
    You should also be able to see assets: https://dev.kualitest.research.bu.edu/admissions/files/2018/09/comm-ave-smaller-compressed.jpg
+
