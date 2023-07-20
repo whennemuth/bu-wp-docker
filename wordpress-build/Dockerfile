@@ -18,21 +18,19 @@ RUN \
   apt install git wget xxd -y && \
   mkdir -p /tmp/repos
 
-RUN env > /tmp/environment
+RUN bash /usr/local/bin/wp-build.sh > /tmp/repos/build-output.txt 2>&1
 
-# RUN bash /usr/local/bin/wp-build.sh > /tmp/repos/build-output.txt 2>&1
+# -----------------------------------------------------------
+#                      STAGE 2
+# -----------------------------------------------------------
+ARG DOCKER_REGISTRY
+FROM ${DOCKER_REGISTRY}/bu-wordpress-baseline
 
-# # -----------------------------------------------------------
-# #                      STAGE 2
-# # -----------------------------------------------------------
-# ARG DOCKER_REGISTRY
-# FROM ${DOCKER_REGISTRY}/bu-wordpress-baseline
+COPY --from=baseline /tmp/repos/ /usr/src/wordpress/
+COPY docker-entrypoint-build.sh /usr/local/bin/
+COPY s3proxy.conf /etc/apache2/sites-available/
 
-# COPY --from=baseline /tmp/repos/ /usr/src/wordpress/
-# COPY docker-entrypoint-build.sh /usr/local/bin/
-# COPY s3proxy.conf /etc/apache2/sites-available/
-
-# # Extend the entrypoint script
-# RUN \
-#   sed -i "/exec "$@"/i\source docker-entrypoint-build.sh \$@" /usr/local/bin/docker-entrypoint.sh
+# Extend the entrypoint script
+RUN \
+  sed -i "/exec "$@"/i\source docker-entrypoint-build.sh \$@" /usr/local/bin/docker-entrypoint.sh
 
