@@ -1,4 +1,6 @@
 
+ARG DOCKER_REGISTRY
+
 # -----------------------------------------------------------
 #                      STAGE 1
 # -----------------------------------------------------------
@@ -15,7 +17,7 @@ COPY wp-build.sh /usr/local/bin/
 RUN \
   apt update && \
   apt upgrade && \
-  apt install git wget xxd -y && \
+  apt install git wget dos2unix xxd -y && \
   mkdir -p /tmp/repos
 
 RUN bash /usr/local/bin/wp-build.sh > /tmp/repos/build-output.txt 2>&1
@@ -23,7 +25,6 @@ RUN bash /usr/local/bin/wp-build.sh > /tmp/repos/build-output.txt 2>&1
 # -----------------------------------------------------------
 #                      STAGE 2
 # -----------------------------------------------------------
-ARG DOCKER_REGISTRY
 FROM ${DOCKER_REGISTRY}/bu-wordpress-baseline
 
 COPY --from=baseline /tmp/repos/ /usr/src/wordpress/

@@ -76,6 +76,7 @@ You may want to edit the name assigned to the image in `docker-compose.yml` to i
    Next, build the image itself *(be in the root directory of the repo)*:
    
    ```
+   export DOCKER_BUILDKIT=0
    docker compose build --no-cache wordpress
    ```
    
