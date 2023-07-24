@@ -45,6 +45,9 @@ COPY --chmod=766 shibboleth.conf /etc/apache2/sites-available/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 
+# Custom htaccess file for multisite
+COPY --chmod=766 .htaccess /var/www/html/
+
 # Extend the entrypoint script
 RUN \
   sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh
