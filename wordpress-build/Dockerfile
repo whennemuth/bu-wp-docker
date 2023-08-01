@@ -15,8 +15,8 @@ COPY docker-entrypoint-build.sh /usr/local/bin/
 COPY wp-build.sh /usr/local/bin/
 
 RUN \
-  apt update && \
-  apt upgrade && \
+  apt update -y && \
+  apt upgrade -y && \
   apt install git wget dos2unix xxd -y && \
   mkdir -p /tmp/repos
 
