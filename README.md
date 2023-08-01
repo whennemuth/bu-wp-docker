@@ -65,7 +65,7 @@ You may want to edit the name assigned to the image in `docker-compose.yml` to i
    
       which is located [here](https://github.com/bu-ist/wp-manifests/blob/master/devl/jaydub-bulb.ini)
    
-   4. **REPOS:** This is a comma-delimited list of git repositories from the .ini file that are to be built into the wordpress installation of the image. *(An option for "all" repositories is not yet available, but will be coming)*. Example:
+   4. **REPOS:** This is a comma-delimited list of git repositories from the .ini file that are to be built into the wordpress installation of the image. Each repo must be locatable in the manifest ini file. To build ALL repositories in the manifest, simply omit this entry from the `.env` file. Example:
    
       ```
       responsive-framework-2-x, bu-cms, bu-sustainability, query-monitor
