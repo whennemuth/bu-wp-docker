@@ -79,8 +79,8 @@ pullSvnRepo() {
     | awk 'BEGIN {RS="/"} {if($1 != "") print $1}' \
     | sed -n '2 p')
 
-  # "Pull" just the revision
-  wget -r $repo --accept-regex=.*/${path}/.* --reject=index.html*
+  # "Pull" just the revision (Make sure level=0, which allows for infinite recursion, as opposed to the default depth of 5)
+  wget -r --level 0 $repo --accept-regex=.*/${path}/.* --reject=index.html*
 
   # Copy the content of the downloaded svn repo to the target directory.
   # The querystring portion of the revision is retained by wget on the end of the file names, so also strip these off while copying.
