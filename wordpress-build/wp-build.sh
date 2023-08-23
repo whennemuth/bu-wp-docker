@@ -79,8 +79,8 @@ pullSvnRepo() {
     | awk 'BEGIN {RS="/"} {if($1 != "") print $1}' \
     | sed -n '2 p')
 
-  # "Pull" just the revision
-  wget -r $repo --accept-regex=.*/${path}/.*
+  # "Pull" just the revision (Make sure level=0, which allows for infinite recursion, as opposed to the default depth of 5)
+  wget -r --level 0 $repo --accept-regex=.*/${path}/.* --reject=index.html*
 
   # Copy the content of the downloaded svn repo to the target directory.
   # The querystring portion of the revision is retained by wget on the end of the file names, so also strip these off while copying.
@@ -153,23 +153,56 @@ processSingleRepo() {
 
 # For each repos in REPOS, pull from the corresponding git repo and extract its content to the wp-content directory.
 processIniFile() {
-  # REPOS is a comma-delimited single line string. Iterate over each delimited value (repo).
-  for repo in $(echo "$REPOS" | awk 'BEGIN{RS = ","}{print $1}') ; do
+
+  processRepo() {
+    local repo=$1
 
     echo "Processing ${repo}..."
 
     loadSection $repo
 
     processSingleRepo  $repo
-  done
+
+  }
+  if [ -n "$REPOS" ] ; then
+    # REPOS is a comma-delimited single line string. Iterate over each delimited value (repo).
+    for repo in $(echo "$REPOS" | awk 'BEGIN{RS = ","}{print $1}') ; do
+      processRepo $repo
+    done
+  else
+    for repo in $(grep  -Po '(?<=\[)[^\]]+(?=\])' $inifile) ; do
+      processRepo $repo
+    done
+  fi
 }
 
 
+printDuration() {
+  local seconds=$((end-start))
+  [ -n "$1" ] && seconds=$1
+  let S=${seconds}%60
+  let MM=${seconds}/60 # Total number of minutes
+  let M=${MM}%60
+  let H=${MM}/60
+
+  # Display "01h02m03s" format
+  [ "$H" -gt "0" ] && printf "%02d%s" $H "h"
+  [ "$M" -gt "0" ] && printf "%02d%s" $M "m"
+  printf "Build duration: %02d%s\n" $S "s"
+}
+
 build() {
+
+  start=$(date +%s)
 
   pullManifestRepo
 
   processIniFile
+
+  end=$(date +%s)
+
+  printDuration
 }
+
 
 build
