@@ -26,8 +26,8 @@ services:
       WORDPRESS_CONFIG_EXTRA: |
         define( 'S3_UPLOADS_BUCKET', '${S3_UPLOADS_BUCKET}');
         define( 'S3_UPLOADS_REGION', '${S3_UPLOADS_REGION}');
-        define( 'S3_UPLOADS_KEY', '${S3_UPLOADS_KEY}');
-        define( 'S3_UPLOADS_SECRET', '${S3_UPLOADS_SECRET}');
+        define( 'S3_UPLOADS_SECRET_ACCESS_KEY', '${S3_UPLOADS_SECRET_ACCESS_KEY}');
+        define( 'S3_UPLOADS_ACCESS_KEY_ID', '${S3_UPLOADS_ACCESS_KEY_ID}');
         define( 'ACCESS_RULES_TABLE', '${ACCESS_RULES_TABLE}');
 
 networks:
