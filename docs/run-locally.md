@@ -16,8 +16,8 @@
    - **SERVER_NAME**: The same value put in your hosts file from earlier. This value will be used by the apache virtual host configuration `"ServerName"` directive.
    - **SP_ENTITY_ID**: This is the value used to set the `ApplicationDefaults.entityID` attribute in the shibboleth plugin configuration file.
    - **IDP_ENTITY_ID**: This is the value used to set the `ApplicationDefaults.Sessions.SSO.entityID` attribute in the shibboleth plugin configuration file.
-   - **SHIB_SP_KEY**: Should be `"sp-key.pem"`, per the earlier step.
-   - **SHIB_SP_CERT**: Should be `"sp-cert.pem"`, per the earlier step.
+   - **SHIB_SP_KEY_FILE**: Should be `"sp-key.pem"`, per the earlier step.
+   - **SHIB_SP_CERT_FILE**: Should be `"sp-cert.pem"`, per the earlier step.
    - **TZ**: The time zone you want the containerized apache service to run with.
 
 4. Modify the environment section in the `"docker-compose.yml"` file.
@@ -58,16 +58,21 @@
    
    ```
    
-6. Run the application:
+6. Run the application *(use one of two ways)* :
 
-   ```
-   # Assumes a cloud-based s3 proxy sigv4 signing service:
-   docker compose up -d
+   - Assumes a cloud-based s3 proxy sigv4 signing service:
    
-   # Add a local container for the s3 proxy sigv4 signing service:
-   docker compose -f compose-s3proxy.yml up -d
-   ```
-
+      ```
+      docker compose up -d
+      ```
+   
+   - Add a local container for the s3 proxy sigv4 signing service:
+      *(NOTE: This requires entering values for the "S3_UPLOADS_" in the .env file.)*
+   
+      ```
+      docker compose -f compose-s3proxy.yml up -d
+      ```
+   
    Visit the admin page at the server name specified earlier, IE: https://dev.kualitest.research.bu.edu/wp-admin/
    Your first browser visit should trigger the wordpress wp-config completion questions.
    You will be asked to supply the database connection details and your default site name.
@@ -78,10 +83,9 @@
    s3://wordpress-protected-s3-assets-dev-assets/original_media/jaydub-bulb.cms-devl.bu.edu/admissions/files/2018/09/cuba-abroad-banner-compressed.jpg
    ```
    
-   You should also be able to see the asset in either of two ways: 
+   You should also be able to see that asset in either of two ways: 
    
    1. Through wordpress:
       https://dev.kualitest.research.bu.edu/admissions/files/2018/09/cuba-abroad-banner-compressed.jpg
-   2. Through the s3proxy container directly:
+   2. Through the s3proxy container directly *(if running the signing proxy locally)*:
       http://dev.kualitest.research.bu.edu:8080/jaydub-bulb.cms-devl.bu.edu/admissions/files/2018/09/cuba-abroad-banner-compressed.jpg
-   

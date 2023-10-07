@@ -8,8 +8,18 @@ SHIBBOLETH_CONF='/etc/apache2/sites-available/shibboleth.conf'
 editShibbolethXML() {
 
   echo "editShibbolethXML..."
-  local sp_key=${SHIB_SP_KEY:-"sp-key.pem"}
-  local sp_cert=${SHIB_SP_CERT:-"sp-cert.pem"}
+  local sp_key=${SHIB_SP_KEY_FILE:-"sp-key.pem"}
+  local sp_cert=${SHIB_SP_CERT_FILE:-"sp-cert.pem"}
+
+  if [ ! -f /etc/shibboleth/$sp_key ] && [ -n "$SHIB_SP_KEY" ] ; then
+    echo "Creating /etc/shibboleth/$sp_key from SHIB_SP_KEY environment variable"
+    echo -n "$SHIB_SP_KEY" > /etc/shibboleth/$sp_key
+  fi
+
+  if [ ! -f /etc/shibboleth/$sp_cert ] && [ -n "$SHIB_SP_CERT" ] ; then
+    echo "Creating /etc/shibboleth/$sp_cert from SHIB_SP_CERT environment variable"
+    echo -n "$SHIB_SP_CERT" > /etc/shibboleth/$sp_cert
+  fi
 
   insertSpEntityId() { sed "s|SP_ENTITY_ID_PLACEHOLDER|$SP_ENTITY_ID|g" < /dev/stdin; }
 
