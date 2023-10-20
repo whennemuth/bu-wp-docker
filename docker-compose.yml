@@ -30,6 +30,9 @@ services:
         define( 'S3_UPLOADS_SECRET_ACCESS_KEY', '${S3_UPLOADS_SECRET_ACCESS_KEY}');
         define( 'S3_UPLOADS_ACCESS_KEY_ID', '${S3_UPLOADS_ACCESS_KEY_ID}');
         define( 'ACCESS_RULES_TABLE', '${ACCESS_RULES_TABLE}');
+        define( 'S3_UPLOADS_OBJECT_ACL', null);
+        define( 'S3_UPLOADS_AUTOENABLE', true );
+        define( 'S3_UPLOADS_DISABLE_REPLACE_UPLOAD_URL', true);
 
 networks:
   wp-bridge:
