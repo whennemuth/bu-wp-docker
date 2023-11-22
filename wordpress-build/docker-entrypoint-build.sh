@@ -12,11 +12,6 @@ setS3ProxyHost() {
   sed -i 's|S3PROXY_HOST_PLACEHOLDER|'$S3PROXY_HOST'|g' $S3PROXY_CONF
 }
 
-setForwardedForHost() {
-  echo "setForwardedForHost..."
-  sed -i 's|FORWARDED_FOR_HOST_PLACEHOLDER|'$FORWARDED_FOR_HOST'|g' $S3PROXY_CONF
-}
-
 # Append an include statement for s3proxy.conf as a new line in wordpress.conf directly below a placeholder.
 includeS3ProxyConfig() {
   echo "includeS3ProxyConfig..."
@@ -26,8 +21,6 @@ includeS3ProxyConfig() {
 if uninitialized_build; then
 
   setS3ProxyHost
-
-  setForwardedForHost
 
   includeS3ProxyConfig
 fi
