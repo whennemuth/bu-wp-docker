@@ -44,6 +44,8 @@ COPY --chmod=766 wordpress.conf /etc/apache2/sites-enabled/
 COPY --chmod=766 shibboleth.conf /etc/apache2/sites-available/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
+# Custom htaccess file for multisite
+COPY --chmod=766 .htaccess /var/www/html/
 
 # Extend the entrypoint script
 RUN \
