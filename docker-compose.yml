@@ -24,7 +24,6 @@ services:
       S3PROXY_HOST: http://s3proxy:8080/
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
       WORDPRESS_CONFIG_EXTRA: |
-        define( 'WP_ALLOW_MULTISITE', true );
         define( 'S3_UPLOADS_BUCKET', '${S3_UPLOADS_BUCKET}');
         define( 'S3_UPLOADS_REGION', '${S3_UPLOADS_REGION}');
         define( 'S3_UPLOADS_SECRET', '${S3_UPLOADS_SECRET}');
