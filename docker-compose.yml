@@ -21,14 +21,19 @@ services:
         MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
         REPOS: ${REPOS}
     environment:
-      S3PROXY_HOST: https://s3proxy.kualitest.research.bu.edu/
+      S3PROXY_HOST: http://s3proxy:8080/
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
       WORDPRESS_CONFIG_EXTRA: |
+        define('MULTISITE', true);
+        define('SUBDOMAIN_INSTALL', false);
         define( 'S3_UPLOADS_BUCKET', '${S3_UPLOADS_BUCKET}');
         define( 'S3_UPLOADS_REGION', '${S3_UPLOADS_REGION}');
-        define( 'S3_UPLOADS_SECRET_ACCESS_KEY', '${S3_UPLOADS_SECRET_ACCESS_KEY}');
-        define( 'S3_UPLOADS_ACCESS_KEY_ID', '${S3_UPLOADS_ACCESS_KEY_ID}');
+        define( 'S3_UPLOADS_SECRET', '${S3_UPLOADS_SECRET}');
+        define( 'S3_UPLOADS_KEY', '${S3_UPLOADS_KEY}');
         define( 'ACCESS_RULES_TABLE', '${ACCESS_RULES_TABLE}');
+        define( 'S3_UPLOADS_OBJECT_ACL', null);
+        define( 'S3_UPLOADS_AUTOENABLE', true );
+        define( 'S3_UPLOADS_DISABLE_REPLACE_UPLOAD_URL', true);
 
 networks:
   wp-bridge:

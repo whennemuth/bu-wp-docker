@@ -12,7 +12,7 @@ services:
       - ./mysql/persisted_data:/bitnami/mysql/data
     environment:
       MYSQL_DATABASE: wp_db
-      MYSQL_ROOT_PASSWORD: ${WORDPRESS_DB_PASSWORD:-"password"}
+      MYSQL_ROOT_PASSWORD: ${WORDPRESS_DB_PASSWORD:-password}
     networks:
       wp-bridge:
 
@@ -34,9 +34,10 @@ services:
       TZ: America/New_York
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: root
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:-"password"}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:-password}
       WORDPRESS_DB_NAME: wp_db
       WORDPRESS_DEBUG: true
+      WP_CLI_ALLOW_ROOT: true
     volumes:
       - ./wordpress-baseline/sandbox/:/var/www/html/
       - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
