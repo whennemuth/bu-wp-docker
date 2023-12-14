@@ -40,3 +40,5 @@ services:
 networks:
   wp-bridge:
     driver: bridge
+volumes:
+  db_data: {}
