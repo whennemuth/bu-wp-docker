@@ -30,18 +30,13 @@ RUN \
   ./configure --enable-redis-igbinary; \
   make && make install;
 
-# Shibboleth
+# Modules
 #   1) Install and enable modules
 RUN \
-  apt-get -y install libapache2-mod-shib && \
-  apache2ctl -M | grep mod_shib && \
-  a2enmod auth_basic headers rewrite ssl proxy proxy_http env shib
+  a2enmod auth_basic headers rewrite ssl proxy proxy_http env
 #   2) Copy and adjust files
-COPY --chmod=766 shibboleth2-template.xml /etc/shibboleth/
-COPY --chmod=766 attribute-map.xml /etc/shibboleth/
 COPY --chmod=777 docker-entrypoint-baseline.sh /usr/local/bin/
 COPY --chmod=766 wordpress.conf /etc/apache2/sites-enabled/
-COPY --chmod=766 shibboleth.conf /etc/apache2/sites-available/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 

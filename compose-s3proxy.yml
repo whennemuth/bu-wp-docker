@@ -30,6 +30,26 @@ services:
     networks:
       wp-bridge:
 
+  shibsp:
+    image: ${DOCKER_REGISTRY}/bu-shibboleth-sp 
+    container_name: sp    
+    environment:
+      TZ: UTC
+      AWS_PROFILE: ${AWS_PROFILE}
+      EXPRESS_PORT: ${SP_PORT:-5000}
+      ENTITY_ID: ${ENTITY_ID}
+      IDP_CERT: ${IDP_CERT}
+      ENTRY_POINT: ${ENTRY_POINT}
+      LOGOUT_URL: ${LOGOUT_URL}
+      SAML_CERT: ${SAML_CERT}
+      SAML_PK: ${SAML_PK}
+      APP_HOST: wordpress
+      # DEBUG: 'true'
+    ports:
+      - '${SP_PORT:-5000}:${SP_PORT:-5000}'
+    networks:
+      wp-bridge:
+
   wordpress:
     extends:
       file: docker-compose.yml

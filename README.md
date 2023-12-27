@@ -4,7 +4,7 @@ This repository comprises two docker build contexts for producing a final docker
 Such containers can:
 
 - Be run locally as part of a set of a docker-compose service suite. *(See: [Running locally](./local.md))*
-- Turn an on-premise wordpress server into a simple docker host, moving the services provided by apache, shibboleth service provider, etc. into the container. 
+- Turn an on-premise wordpress server into a simple docker host, also moving the apache service into the container. The shibboleth SP service, it is assumed is running in cloudfront@edge and will route to this apps [ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) as an origin. 
 - Run as part of an ec2 or fargate based ecs cluster
 
 This build is based on the standard docker image for WordPress, version 5.4.2 with php version 7.4 and apache:

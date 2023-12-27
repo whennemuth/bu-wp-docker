@@ -19,6 +19,9 @@ services:
       wp-bridge:
 
   wordpress:
+    env_file:
+      - .env
+      - .env.shibless
     depends_on:
       - db
     build: ./wordpress-baseline
@@ -31,10 +34,6 @@ services:
       - '80:80'
     environment:
       SERVER_NAME: dev.kualitest.research.bu.edu
-      SP_ENTITY_ID: https://*.kualitest.research.bu.edu/shibboleth
-      IDP_ENTITY_ID: https://shib-test.bu.edu/idp/shibboleth
-      SHIB_SP_KEY_FILE: sp-key.pem
-      SHIB_SP_CERT_FILE: sp-cert.pem
       TZ: America/New_York
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
@@ -44,12 +43,7 @@ services:
       WP_CLI_ALLOW_ROOT: true
     volumes:
       - ./wordpress-baseline/sandbox/:/var/www/html/
-      - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
-      - ./wordpress-baseline/sp-cert.pem:/etc/shibboleth/sp-cert.pem
       - ./wordpress-baseline/logs-apache:/var/log/apache2
-      - ./wordpress-baseline/logs-shib:/var/log/shibboleth
-    # secrets:
-    #   - wp-sp-key
     networks:
       wp-bridge:
 
@@ -58,13 +52,3 @@ networks:
     driver: bridge
 volumes:
   db_data: {}
-
-# secrets:
-#   wp-sp-shib:
-#     name: ${SECRETS_MANAGER_SHIB_SECRET}
-#     x-aws-keys:
-#       - wp-sp-key
-#       - wp-sp-cert
-#     external: true
-
-    # /run/secrets/wp-sp-shib/wp-sp-key
