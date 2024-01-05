@@ -47,7 +47,7 @@
         FURTHER DOCUMENTATION: https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065334342/Sessions
         -->
         <Sessions lifetime="28800" timeout="0" relayState="ss:mem"
-                  checkAddress="false" handlerSSL="false" cookieProps="http">
+                  checkAddress="false" handlerSSL="false" handlerURL="/saml/wp-app/shibboleth">
 
             <!--
             Configures SSO for a default IdP. To allow for >1 IdP, remove
