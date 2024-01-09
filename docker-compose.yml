@@ -34,6 +34,7 @@ services:
         define( 'S3_UPLOADS_OBJECT_ACL', null);
         define( 'S3_UPLOADS_AUTOENABLE', true );
         define( 'S3_UPLOADS_DISABLE_REPLACE_UPLOAD_URL', true);
+        define( 'BU_INCLUDES_PATH', '/var/www/html/bu-includes' );
 
 networks:
   wp-bridge:
