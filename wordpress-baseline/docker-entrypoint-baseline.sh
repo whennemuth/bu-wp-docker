@@ -101,6 +101,9 @@ else
       includeShibbolethConfig
 
       service shibd start
+
+      wp bu-core generate-mu-plugin-loader --path=/var/www/html --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php
+
     fi
 
     setVirtualHost
