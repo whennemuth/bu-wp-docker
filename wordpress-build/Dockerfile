@@ -20,7 +20,7 @@ RUN \
   apt install git wget dos2unix xxd -y && \
   mkdir -p /tmp/repos
 
-RUN bash /usr/local/bin/wp-build.sh > /tmp/repos/build-output.txt 2>&1
+RUN bash /usr/local/bin/wp-build.sh 2>&1 | tee /tmp/repos/build-output.txt
 
 # -----------------------------------------------------------
 #                      STAGE 2
