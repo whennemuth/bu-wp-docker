@@ -34,8 +34,10 @@ services:
     extends:
       file: docker-compose.yml
       service: wordpress
+    restart: no
     environment:
       S3PROXY_HOST: http://s3proxy:8080
+      # SHELL: true
 
 networks:
   wp-bridge:
