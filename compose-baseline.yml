@@ -33,9 +33,10 @@ services:
       SERVER_NAME: dev.kualitest.research.bu.edu
       HTTP_HOST: dev.kualitest.research.bu.edu
       SP_ENTITY_ID: https://*.kualitest.research.bu.edu/shibboleth
-      IDP_ENTITY_ID: https://shib-test.bu.edu/idp/shibboleth
+      IDP_ENTITY_ID: https://${SHIB_DOMAIN}/idp/shibboleth
       SHIB_SP_KEY_FILE: sp-key.pem
       SHIB_SP_CERT_FILE: sp-cert.pem
+      SHIB_IDP_LOGOUT: https://${SHIB_DOMAIN}/idp/logout.jsp
       TZ: America/New_York
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress

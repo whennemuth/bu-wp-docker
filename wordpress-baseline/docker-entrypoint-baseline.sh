@@ -37,6 +37,14 @@ local sp_key=${SHIB_SP_KEY_FILE:-"sp-key.pem"}
   > /etc/shibboleth/shibboleth2.xml
 }
 
+# Put the correct logout url into the shibboleth.conf file
+editShibbolethConf() {
+
+  echo "editShibbolethConf..."
+  
+  sed -i "s|SHIB_IDP_LOGOUT_PLACEHOLDER|$SHIB_IDP_LOGOUT|g" /etc/apache2/sites-available/shibboleth.conf
+}
+
 # Generate a shibboleth idp metadata file if one does not already exist.
 getIdpMetadataFile() {
   echo "getIdpMetadataFile..."
@@ -113,6 +121,8 @@ else
     if requireShibboleth ; then
 
       editShibbolethXML
+
+      editShibbolethConf
 
       getIdpMetadataFile
 

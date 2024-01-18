@@ -53,6 +53,8 @@
    S3_UPLOADS_SECRET_ACCESS_KEY=[value]
    S3_UPLOADS_ACCESS_KEY_ID=[value]
    
+   SHIB_DOMAIN=shib-test.bu.edu
+   
    # miscellaneous
    ACCESS_RULES_TABLE=[value]
    
