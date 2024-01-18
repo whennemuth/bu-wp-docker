@@ -50,7 +50,7 @@ getIdpMetadataFile() {
   echo "getIdpMetadataFile..."
   local xmlfile=/etc/shibboleth/idp-metadata.xml
   if [ ! -f $xmlfile ] ; then
-    curl https://shib-test.bu.edu/idp/shibboleth -o $xmlfile
+    curl $IDP_ENTITY_ID -o $xmlfile
   fi
 }
 
