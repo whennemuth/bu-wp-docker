@@ -85,6 +85,18 @@ requireShibboleth() {
   ([ -n "$SHIB_SP_KEY" ] && [ -n "$SHIB_SP_CERT" ]) && true || false
 }
 
+MU_PLUGIN_LOADER='/var/www/html/wp-content/mu-plugins/loader.php'
+check_mu_plugin_loader() {
+  if [ -f $MU_PLUGIN_LOADER ] ; then
+    echo "mu_plugin_loader already generated..."
+  else
+    echo "generate_mu_plugin_loader..."
+    wp bu-core generate-mu-plugin-loader \
+      --path=/var/www/html \
+      --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php
+  fi
+}
+
 MULTISITE_LOG='/var/www/html/multisite.log'
 check_multisite() {
   if [ "$MULTISITE" != 'true' ] ; then
@@ -116,6 +128,8 @@ else
 
   check_multisite
 
+  check_mu_plugin_loader
+
   if uninitialized_baseline ; then
 
     if requireShibboleth ; then
@@ -132,12 +146,8 @@ else
 
       echo 'shibd start...'
       service shibd start
-
-      wp bu-core generate-mu-plugin-loader --path=/var/www/html --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php
-
     fi
 
     setVirtualHost
   fi
 fi
-
