@@ -8,7 +8,7 @@ SHIBBOLETH_CONF='/etc/apache2/sites-available/shibboleth.conf'
 editShibbolethXML() {
 
   echo "editShibbolethXML..."
-  local sp_key=${SHIB_SP_KEY_FILE:-"sp-key.pem"}
+local sp_key=${SHIB_SP_KEY_FILE:-"sp-key.pem"}
   local sp_cert=${SHIB_SP_CERT_FILE:-"sp-cert.pem"}
 
   if [ ! -f /etc/shibboleth/$sp_key ] && [ -n "$SHIB_SP_KEY" ] ; then
@@ -32,7 +32,7 @@ editShibbolethXML() {
   cat /etc/shibboleth/shibboleth2-template.xml \
     | insertSpEntityId \
     | insertIdpEntityId \
-    | insertSpKey \
+| insertSpKey \
     | insertSpCert \
   > /etc/shibboleth/shibboleth2.xml
 }
@@ -77,6 +77,24 @@ requireShibboleth() {
   ([ -n "$SHIB_SP_KEY" ] && [ -n "$SHIB_SP_CERT" ]) && true || false
 }
 
+MULTISITE_LOG='/var/www/html/multisite.log'
+check_multisite() {
+  if [ "$MULTISITE" != 'true' ] ; then
+    echo "multisite not applicable"
+  elif [ -f $MULTISITE_LOG ] ; then
+    echo "multisite already installed..."
+  else
+    echo "installing multisite..."
+    wp core multisite-install --title="local root site" \
+      --url="http://$SERVER_NAME" \
+      --admin_user="admin" \
+      --admin_email="user@example.com"
+    if [ $? -eq 0 ] ; then
+      date > $MULTISITE_LOG
+    fi
+  fi
+}
+
 # Append an include statement for shibboleth.conf as a new line in wordpress.conf directly below a placeholder.
 includeShibbolethConfig() {
   sed -i 's|# SHIBBOLETH_PLACEHOLDER|Include '${SHIBBOLETH_CONF}'|' $WORDPRESS_CONF
@@ -87,6 +105,8 @@ if [ "$SHELL" == 'true' ] ; then
   # Keeps the container running, but apache is not started.
   tail -f /dev/null
 else
+
+  check_multisite
 
   if uninitialized_baseline ; then
 
@@ -100,6 +120,7 @@ else
 
       includeShibbolethConfig
 
+      echo 'shibd start...'
       service shibd start
 
       wp bu-core generate-mu-plugin-loader --path=/var/www/html --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php

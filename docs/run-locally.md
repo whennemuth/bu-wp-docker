@@ -28,7 +28,7 @@
        `https://s3proxy.kualitest.research.bu.edu/` 
      - Proxy running in local container *(where "s3proxy" is the name of the docker compose service)*:
        `http://s3proxy:8080/`
-   - **FORWARDED_FOR_HOST:** Include this value to indicate the container is NOT for a multisite wordpress installation. Set it to the value of the single site that wordpress will host. It is this value that will be issued as the `"X-Forwarded-Host"` header value in http requests proxied to the s3 object lambda access point for assets by apache. Example: `"jaydub-bulb.cms-devl.bu.edu"`*(NOTE: Multisite not currently supported, coming soon)*.
+   - **FORWARDED_FOR_HOST:** Include this value to indicate the container is NOT for a multisite wordpress installation. Set it to the value of the single site that wordpress will host. It is this value that will be issued as the `"X-Forwarded-Host"` header value in http requests proxied to the s3 object lambda access point for assets by apache. Example: `"jaydub-bulb.cms-devl.bu.edu"`.
 
 5. Add the following entries to the [`.env`](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) file at the root of the project with secrets and environment variables for the container:
    The values placed in this file are passed into the container through environment variables, including `WORDPRESS_CONFIG_EXTRA`  *(SEE: ["Inject configuration using environment variable #142"](https://github.com/docker-library/wordpress/pull/142)):
