@@ -46,8 +46,8 @@ services:
       WP_CLI_ALLOW_ROOT: true
     volumes:
       - ./wordpress-baseline/sandbox/:/var/www/html/
-      - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
-      - ./wordpress-baseline/sp-cert.pem:/etc/shibboleth/sp-cert.pem
+      # - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
+      # - ./wordpress-baseline/sp-cert.pem:/etc/shibboleth/sp-cert.pem
       - ./wordpress-baseline/logs-apache:/var/log/apache2
       - ./wordpress-baseline/logs-shib:/var/log/shibboleth
     # secrets:
