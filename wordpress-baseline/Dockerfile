@@ -42,6 +42,7 @@ COPY --chmod=766 attribute-map.xml /etc/shibboleth/
 COPY --chmod=777 docker-entrypoint-baseline.sh /usr/local/bin/
 COPY --chmod=766 wordpress.conf /etc/apache2/sites-enabled/
 COPY --chmod=766 shibboleth.conf /etc/apache2/sites-available/
+COPY --chmod=766 shib.conf /etc/apache2/conf-available/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 

@@ -31,10 +31,12 @@ services:
       - '80:80'
     environment:
       SERVER_NAME: dev.kualitest.research.bu.edu
+      HTTP_HOST: dev.kualitest.research.bu.edu
       SP_ENTITY_ID: https://*.kualitest.research.bu.edu/shibboleth
-      IDP_ENTITY_ID: https://shib-test.bu.edu/idp/shibboleth
-      SHIB_SP_KEY_FILE: sp-key.pem
-      SHIB_SP_CERT_FILE: sp-cert.pem
+      IDP_ENTITY_ID: https://${SHIB_DOMAIN}/idp/shibboleth
+      SHIB_IDP_LOGOUT: https://${SHIB_DOMAIN}/idp/logout.jsp
+      SHIB_SP_KEY: ${SHIB_SP_KEY}
+      SHIB_SP_CERT: ${SHIB_SP_CERT}
       TZ: America/New_York
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
@@ -43,9 +45,6 @@ services:
       WORDPRESS_DEBUG: true
       WP_CLI_ALLOW_ROOT: true
     volumes:
-      - ./wordpress-baseline/sandbox/:/var/www/html/
-      - ./wordpress-baseline/sp-key.pem:/etc/shibboleth/sp-key.pem
-      - ./wordpress-baseline/sp-cert.pem:/etc/shibboleth/sp-cert.pem
       - ./wordpress-baseline/logs-apache:/var/log/apache2
       - ./wordpress-baseline/logs-shib:/var/log/shibboleth
     # secrets:
