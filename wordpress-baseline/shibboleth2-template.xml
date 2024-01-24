@@ -47,7 +47,7 @@
         FURTHER DOCUMENTATION: https://shibboleth.atlassian.net/wiki/spaces/SP3/pages/2065334342/Sessions
         -->
         <Sessions lifetime="28800" timeout="0" relayState="ss:mem"
-                  checkAddress="false" handlerSSL="false" cookieProps="http">
+                  checkAddress="false" handlerSSL="false" handlerURL="/saml/wp-app/shibboleth">
 
             <!--
             Configures SSO for a default IdP. To allow for >1 IdP, remove
@@ -111,8 +111,8 @@
         <!-- Default filtering policy for recognized attributes, lets other data pass. -->
         <AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>
     
-        <!-- Simple file-based resolver for using a single keypair. -->
-        <CredentialResolver type="File" key="SHIB_SP_KEY_PLACEHOLDER" certificate="SHIB_SP_CERT_PLACEHOLDER"/>
+        <!-- Simple file-based resolver for using a single keypair. Put pem files in the same directory as this file. -->
+        <CredentialResolver type="File" key="sp-key.pem" certificate="sp-cert.pem"/>
 
         <!--
         The default settings can be overridden by creating ApplicationOverride elements (see

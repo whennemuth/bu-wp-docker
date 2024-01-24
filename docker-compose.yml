@@ -23,6 +23,7 @@ services:
     environment:
       S3PROXY_HOST: http://s3proxy:8080/
       FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
+      MULTISITE: true
       WORDPRESS_CONFIG_EXTRA: |
         define('MULTISITE', true);
         define('SUBDOMAIN_INSTALL', false);
@@ -34,6 +35,7 @@ services:
         define( 'S3_UPLOADS_OBJECT_ACL', null);
         define( 'S3_UPLOADS_AUTOENABLE', true );
         define( 'S3_UPLOADS_DISABLE_REPLACE_UPLOAD_URL', true);
+        define( 'BU_INCLUDES_PATH', '/var/www/html/bu-includes' );
 
 networks:
   wp-bridge:
