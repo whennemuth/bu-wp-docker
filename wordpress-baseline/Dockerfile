@@ -10,6 +10,11 @@ RUN \
   apt install -y $(apt-cache search mysql-client | head -1 | awk '{print $1}'); \
   docker-php-ext-install pdo pdo_mysql;
 
+# Install AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+	./aws/install
+
 # Igbinary
 RUN \
   mkdir -p /usr/src/php/ext \
