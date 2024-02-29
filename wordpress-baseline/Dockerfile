@@ -3,7 +3,7 @@ FROM wordpress:5.4.2-php7.4-apache
 # Client utils & tools
 RUN \
   apt update && apt upgrade; \
-  apt install curl less git vim dos2unix ssl-cert util-linux jq -y; \
+  apt install curl less git vim dos2unix ssl-cert util-linux jq unzip groff -y; \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar; \
   chmod +x wp-cli.phar; \
   mv wp-cli.phar /usr/local/bin/wp; \
