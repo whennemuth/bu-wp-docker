@@ -52,6 +52,9 @@ COPY --chmod=766 shib.conf /etc/apache2/conf-available/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 
+# Add custom error pages
+COPY --chmod=766 _s3proxy-custom-errors /var/www/html/_s3proxy-custom-errors
+
 # Custom htaccess file for multisite
 COPY --chmod=766 .htaccess /var/www/html/
 
