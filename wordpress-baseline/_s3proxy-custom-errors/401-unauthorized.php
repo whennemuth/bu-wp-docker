@@ -1,6 +1,10 @@
 <?php
 // Calculate the URL to redirect to the login page.
 $login_url = $_SERVER['Shib-Handler'] . '/Login?target=' . rawurlencode( $_SERVER['SCRIPT_URI'] );
+
+// Emit a location header to force a redirect to the login page.
+// The rest of the HTML is just for browsers that don't follow the location header.
+header('Location: ' . $login_url);
 ?>
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
