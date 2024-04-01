@@ -84,22 +84,20 @@ check_mu_plugin_loader() {
   fi
 }
 
-MULTISITE_LOG='/var/www/html/multisite.log'
-check_multisite() {
-  if [ "$MULTISITE" != 'true' ] ; then
-    echo "multisite not applicable"
-  elif [ -f $MULTISITE_LOG ] ; then
-    echo "multisite already installed..."
-  else
-    echo "installing multisite..."
-    wp core multisite-install --title="local root site" \
-      --url="http://$SERVER_NAME" \
-      --admin_user="admin" \
-      --admin_email="user@example.com"
-    if [ $? -eq 0 ] ; then
-      date > $MULTISITE_LOG
+check_wordpress_install() {
+
+    if ! wp core is-installed 2>/dev/null; then
+      # WP is not installed. Let's try installing it.
+      echo "installing multisite..."
+      wp core multisite-install --title="local root site" \
+        --url="http://$SERVER_NAME" \
+        --admin_user="admin" \
+        --admin_email="no-use-admin@bu.edu"
+
+      else
+        # WP is already installed.
+        echo "WordPress is already installed. No need to create a new database."
     fi
-  fi
 }
 
 # Append an include statement for shibboleth.conf as a new line in wordpress.conf directly below a placeholder.
@@ -113,7 +111,7 @@ if [ "$SHELL" == 'true' ] ; then
   tail -f /dev/null
 else
 
-  check_multisite
+  check_wordpress_install
 
   check_mu_plugin_loader
 
