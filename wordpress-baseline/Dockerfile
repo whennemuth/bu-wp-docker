@@ -3,12 +3,18 @@ FROM wordpress:5.4.2-php7.4-apache
 # Client utils & tools
 RUN \
   apt update && apt upgrade; \
-  apt install curl less git vim dos2unix ssl-cert util-linux jq -y; \
+  apt install curl less git vim dos2unix ssl-cert util-linux jq unzip groff -y; \
   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar; \
   chmod +x wp-cli.phar; \
   mv wp-cli.phar /usr/local/bin/wp; \
   apt install -y $(apt-cache search mysql-client | head -1 | awk '{print $1}'); \
   docker-php-ext-install pdo pdo_mysql;
+
+# Install AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+  unzip -q awscliv2.zip && \
+  ./aws/install && \
+  rm awscliv2.zip && rm -rf aws/
 
 # Igbinary
 RUN \
@@ -39,6 +45,9 @@ COPY --chmod=777 docker-entrypoint-baseline.sh /usr/local/bin/
 COPY --chmod=766 wordpress.conf /etc/apache2/sites-enabled/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
+
+# Add custom error pages
+COPY --chmod=766 _s3proxy-custom-errors /var/www/html/_s3proxy-custom-errors
 
 # Custom htaccess file for multisite
 COPY --chmod=766 .htaccess /var/www/html/

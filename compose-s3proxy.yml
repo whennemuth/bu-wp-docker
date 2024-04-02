@@ -1,3 +1,22 @@
+# compose-s3proxy.yml
+#
+# This Docker Compose file extends the local development configuration defined in docker-compose.yml to add an S3 proxy service.
+# This allows our application to interact with AWS S3 using the AWS Signature Version 4 signing process.
+# It includes additional configurations for the `wordpress` services, and defines a new `s3proxy` service.
+#
+# Services:
+# - db: Extends the `db` service from docker-compose.yml. No additional configurations are added in this file.
+# - s3proxy: A new service that runs a proxy for AWS S3. This service is configured with environment variables for AWS credentials and the S3 region.
+# - wordpress: Extends the `wordpress` service from docker-compose.yml. Adds an environment variable for the S3 proxy host.
+#
+# Networks:
+# - wp-bridge: A network that allows our services to communicate with each other. This is the same network defined in docker-compose.yml.
+#
+# Volumes:
+# - db_data: A volume that persists our database data across container restarts. This is the same volume defined in docker-compose.yml.
+#
+# Note: This file uses environment variables for certain settings, such as the AWS credentials and S3 region. These should be set in your environment before running Docker Compose.
+
 version: '3.9'
 
 services:
@@ -54,11 +73,17 @@ services:
     extends:
       file: docker-compose.yml
       service: wordpress
+    restart: no
     environment:
       S3PROXY_HOST: http://s3proxy:8080
+      # SHELL: true
+    volumes:
+      - wp_html:/var/www/html/
+
 
 networks:
   wp-bridge:
     driver: bridge
 volumes:
   db_data: {}
+  wp_html: {}

@@ -1,3 +1,22 @@
+# compose-baseline.yml
+#
+# This Docker Compose file defines the baseline configuration for our application.
+# It sets up a MariaDB database and a WordPress service, both of which are essential components of our application.
+# Other Docker Compose files in this project may extend the services defined in this file
+# to add additional configurations or override certain settings.
+#
+# Services:
+# - db: A MariaDB database service. This is where our WordPress installation will store its data.
+# - wordpress: A WordPress service. This is our main application.
+#
+# Networks:
+# - wp-bridge: A network that allows our services to communicate with each other.
+#
+# Volumes:
+# - db_data: A volume that persists our database data across container restarts.
+#
+# Note: This file uses environment variables for certain settings, such as the database password. These should be set in your environment before running Docker Compose.
+
 version: '3.1'
 
 services:
