@@ -100,6 +100,28 @@ check_wordpress_install() {
     fi
 }
 
+setup_redis() {
+  # If there is a REDIS_HOST and REDIS_PORT available in the environment, add them as wp config values.
+  if [ -n "$REDIS_HOST" ] && [ -n "$REDIS_PORT" ] ; then
+    echo "Redis host detected, setting up Redis..."
+    wp config set WP_REDIS_HOST $REDIS_HOST --add --type=constant
+    wp config set WP_REDIS_PORT $REDIS_PORT --add --type=constant
+
+    # If there is a REDIS_PASSWORD available in the environment, add it as a wp config value.
+    if [ -n "$REDIS_PASSWORD" ] ; then
+      wp config set WP_REDIS_PASSWORD $REDIS_PASSWORD --add --type=constant
+    fi
+
+    # If the redis-cache plugin is available, create the object-cache.php file and network activate the plugin.
+    if wp plugin is-installed redis-cache ; then
+      echo "redis-cache plugin detected, setting up object cache..."
+      wp plugin activate redis-cache
+      wp redis update-dropin
+    fi
+
+  fi
+}
+
 # Append an include statement for shibboleth.conf as a new line in wordpress.conf directly below a placeholder.
 includeShibbolethConfig() {
   sed -i 's|# SHIBBOLETH_PLACEHOLDER|Include '${SHIBBOLETH_CONF}'|' $WORDPRESS_CONF
@@ -114,6 +136,8 @@ else
   check_wordpress_install
 
   check_mu_plugin_loader
+
+  setup_redis
 
   if uninitialized_baseline ; then
 
