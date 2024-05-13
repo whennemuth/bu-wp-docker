@@ -1,5 +1,8 @@
 FROM wordpress:5.4.2-php7.4-apache
 
+# Set ARG for architecture
+ARG TARGETARCH
+
 # Client utils & tools
 RUN \
   apt update && apt upgrade; \
@@ -11,7 +14,11 @@ RUN \
   docker-php-ext-install pdo pdo_mysql;
 
 # Install AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"; \
+  else \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+  fi && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
   rm awscliv2.zip && rm -rf aws/
