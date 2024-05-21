@@ -15,7 +15,7 @@
 #
 # Note: This file uses environment variables for certain settings, such as the Docker registry and Git credentials. These should be set in your environment before running Docker Compose.
 
-version: '3.9'
+#version: '3.9'
 
 services:
 
