@@ -35,7 +35,7 @@ pullManifestRepo() {
     cd $repo_dir
     git init
     git remote add origin https://${GIT_USER}:${GIT_PAT}@github.com/bu-ist/wp-manifests.git
-    git pull --depth 1 origin master
+    git pull --depth 1 origin testing2 # testing2 is a temporary branch, replace with master when ready.
   )
 }
 
