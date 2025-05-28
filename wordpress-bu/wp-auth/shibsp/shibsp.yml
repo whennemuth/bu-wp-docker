@@ -1,0 +1,38 @@
+
+version: '3.9'
+
+name: shibsp
+
+x-description: |
+  This Docker Compose file defines a Shibboleth Service Provider (SP) service that integrates with a WordPress 
+  application. It sets up the SP service to handle authentication and authorization for the WordPress site.
+  The SP service is configured to communicate with an Identity Provider (IdP) using SAML.
+  NOTE: Intended to be used by merging with another Docker Compose file, and NOT run on its own.
+  From the project root, run:
+
+  docker compose \
+    -f master.yml \
+    -f wordpress-baseline/baseline.yml \
+    -f wordpress-bu/wp-build/build.yml \
+    -f wordpress-bu/wp-auth/shibsp/shibsp.yml \
+    config|build|up
+
+services:
+
+  shibsp:
+    image: ${DOCKER_REGISTRY}/bu-shibboleth-sp 
+    container_name: sp    
+    environment:
+      TZ: UTC
+      AWS_PROFILE: ${AWS_PROFILE}
+      EXPRESS_PORT: ${SP_PORT:-5000}
+      ENTITY_ID: ${ENTITY_ID}
+      IDP_CERT: ${IDP_CERT}
+      ENTRY_POINT: ${ENTRY_POINT}
+      LOGOUT_URL: ${LOGOUT_URL}
+      SAML_CERT: ${SAML_CERT}
+      SAML_PK: ${SAML_PK}
+      APP_HOST: wordpress
+      # DEBUG: 'true'
+    ports:
+      - '${SP_PORT:-5000}:${SP_PORT:-5000}'

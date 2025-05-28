@@ -1,3 +1,10 @@
 .env
 .env.*
 ./bu-wp-docker.code-workspace
+./_logs-shib
+./_logs-shib/*
+./_logs-apache
+./_logs-apache/*
+./_mount/
+./_mount/*
+config-output.yml

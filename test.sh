@@ -83,4 +83,8 @@ else
   fi
 fi
 
+source wordpress-bu/wp-auth/modshib/docker-entrypoint-modshib.sh $@
 # EXTRA_CONTENT_INSERTION_POINT
+
+source wordpress-bu/wp-auth/modshib/docker-entrypoint-modshib.sh $@
+# AFTER_EXTRA_CONTENT_INSERTION_POINT

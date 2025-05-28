@@ -1,0 +1,46 @@
+version: '3.9'
+
+name: build
+
+x-description: |
+  This Docker Compose file extends the baseline configuration defined in wordpress-baseline/baseline.yml to set 
+  up a local development environment for the application. It includes additional configurations for the `db` and 
+  `wordpress` services, and defines a custom WordPress image that is built from our local WordPress build context.
+
+  From the project root, run:
+
+  docker compose \
+    -f master.yml \
+    -f wordpress-baseline/baseline.yml \
+    -f wordpress-bu/wp-build/build.yml \
+    config|build|up
+
+services:
+
+  wordpress:
+    image: ${DOCKER_REGISTRY}/${DOCKER_REPO:-bu-wordpress-build}:${DOCKER_TAG:-latest}
+    restart: no
+    build: 
+      # Make relative to the project root set by master.yml
+      context: wordpress-bu/wp-build/      
+      args:
+        DOCKER_REGISTRY: ${DOCKER_REGISTRY}
+        GIT_USER: ${GIT_USER}
+        GIT_PAT: ${GIT_PAT}
+        MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
+        REPOS: ${REPOS}
+    environment:
+      # "S3_" prefixed variables assume that s3proxy.yml will be merged using the -f flag
+      WORDPRESS_CONFIG_EXTRA: |
+        define('MULTISITE', true);
+        define('SUBDOMAIN_INSTALL', false);
+        define( 'S3_UPLOADS_BUCKET', '${S3_UPLOADS_BUCKET}');
+        define( 'S3_UPLOADS_REGION', '${S3_UPLOADS_REGION}');
+        define( 'S3_UPLOADS_SECRET', '${S3_UPLOADS_SECRET_ACCESS_KEY}');
+        define( 'S3_UPLOADS_KEY', '${S3_UPLOADS_ACCESS_KEY_ID}');
+        define( 'ACCESS_RULES_TABLE', '${ACCESS_RULES_TABLE}');
+        define( 'S3_UPLOADS_OBJECT_ACL', null);
+        define( 'S3_UPLOADS_AUTOENABLE', true );
+        define( 'S3_UPLOADS_DISABLE_REPLACE_UPLOAD_URL', true);
+        define( 'BU_INCLUDES_PATH', '/var/www/html/bu-includes' );
+
