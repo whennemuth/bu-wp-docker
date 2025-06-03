@@ -27,24 +27,16 @@ The following variables are defined in the environment for `baseline.yml`. Adjus
 
 ### Building with Docker Compose:
 
-You may want to edit the name assigned to the image in `baseline.yml` to indicate a different registry - modify **DOCKER_REGISTRY** in the [`.env`](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) file at the root of the project.
-Also, cleanup if working on the image and doing multiple builds:
+1. Make sure you enable [Multi-Platform Support](../docs/multi-platform-builds.md).
 
-```
-docker rmi $(docker images --filter dangling=true -q) 2> /dev/null
-```
-
-
-
-### Running with Docker Compose:
-
-1. If running the app *(docker compose up)*, append to your hosts file an entry that matches the bu.edu subdomain you will be using *(on windows, `C:\Windows\System32\drivers\etc\hosts`)*:
+2. You may want to edit the name assigned to the image in `baseline.yml` to indicate a different registry - modify **DOCKER_REGISTRY** in the [`.env`](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) file at the root of the project.
+   Also, cleanup if working on the image and doing multiple builds:
 
    ```
-   127.0.0.1	dev.kualitest.research.bu.edu
+   docker rmi $(docker images --filter dangling=true -q) 2> /dev/null
    ```
 
-2. Run the docker command
+3. Run the build command:
 
    ```
    # From the project root:
@@ -52,7 +44,58 @@ docker rmi $(docker images --filter dangling=true -q) 2> /dev/null
    docker compose \
      -f master.yml \
      -f wordpress-baseline/baseline.yml \
-     config|build|up
+     build
+   ```
+
+4. *[Optional]* Publish the image:
+   Put the built image into the BU public registry so it is available for download and reference by ECS stacks.
+
+   ```
+   # Set the registry the image that was built is tagged with:
+   DOCKER_REGISTRY="037860335094.dkr.ecr.us-east-2.amazonaws.com"
+   
+   # Login to the registry
+   aws ecr get-login-password --region us-east-2 | \
+   	docker login --username AWS --password-stdin $DOCKER_REGISTRY
+   
+   # Push the image
+   docker push ${DOCKER_REGISTRY}/bu-wordpress-baseline
+   ```
+
+   
+
+### Running with Docker Compose:
+
+1. If running the app *(docker compose up)*, append to your hosts file an entry that matches the `HOST_NAME` entry you make in the in the [`.env`](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) file at the root of the project for the bu.edu subdomain you will be using *(on windows, `C:\Windows\System32\drivers\etc\hosts`)*:
+
+   ```
+   127.0.0.1	dev.kualitest.research.bu.edu
+   ```
+
+2. Run the docker compose command
+
+   ```
+   # From the project root:
+   
+   docker compose \
+     -f master.yml \
+     -f wordpress-baseline/baseline.yml \
+     up --detach
+   ```
+
+3. Navigate to "localhost" or to the HOST_NAME *(ie: "http://dev.kualitest.research.bu.edu/")* in your browser. You should see the standard WordPress "Hello world!" webpage.
+   NOTE: If you want to poke around inside the WordPress container you can:
+
+   - Use the following to shell into the running container: `docker exec -ti wordpress bash`.
+   - Start a shell directly from the image: `docker run --rm -ti --entrypoint bash 037860335094.dkr.ecr.us-east-2.amazonaws.com/bu-wordpress-baseline`
+
+4. Stop the application
+
+   ```
+   docker compose \
+     -f master.yml \
+     -f wordpress-baseline/baseline.yml \
+     down
    ```
 
    

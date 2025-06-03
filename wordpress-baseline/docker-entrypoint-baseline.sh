@@ -24,7 +24,7 @@ check_mu_plugin_loader() {
     echo "generate_mu_plugin_loader..."
     wp bu-core generate-mu-plugin-loader \
       --path=/var/www/html \
-      --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php
+      --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php 2>&1 || true
   fi
 }
 
@@ -36,7 +36,7 @@ check_wordpress_install() {
     wp core multisite-install --title="local root site" \
       --url="http://$SERVER_NAME" \
       --admin_user="admin" \
-      --admin_email="no-use-admin@bu.edu" 2> /dev/null
+      --admin_email="no-use-admin@bu.edu" 2>&1 || true
 
     else
       # WP is already installed.

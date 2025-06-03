@@ -102,7 +102,7 @@ In the build arguments and environment sections of the`"build.yml"` file, are de
    ```
 
 2. *[Optional]* Publish the image:
-   Put the built image into the BU public registry so it is available to ECS stacks.
+   Put the built image into the BU public registry so it is available available for download and reference by ECS stacks.
 
    ```
    # Retag if necessary
