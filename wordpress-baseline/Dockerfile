@@ -66,3 +66,7 @@ COPY --chmod=766 uploads.ini /usr/local/etc/php/conf.d/
 # docker-entrypoint-baseline.sh directly below the line in the original script that reads "exec "$@""
 RUN \
   sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh
+
+# Add a "pre"-entrypoint script that runs first and then sources the main entrypoint script
+COPY --chmod=766 docker-pre-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-pre-entrypoint.sh"]
