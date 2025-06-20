@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
+# Allow for unbound variable usage.
+set +u
+
 S3PROXY_CONF='/etc/apache2/sites-available/s3proxy.conf'
+WORDPRESS_CONF='/etc/apache2/sites-enabled/wordpress.conf'
 
 uninitialized_build() {
   [ -z "$(cat $WORDPRESS_CONF | grep 's3proxy.conf')" ] && true || false
@@ -20,7 +24,10 @@ includeS3ProxyConfig() {
 
 if uninitialized_build; then
 
-  setS3ProxyHost
+  if [ -n "$S3PROXY_HOST" ] ; then
 
-  includeS3ProxyConfig
+    setS3ProxyHost
+
+    includeS3ProxyConfig
+  fi
 fi
