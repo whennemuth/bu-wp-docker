@@ -45,7 +45,7 @@ S3_UPLOADS_REGION=us-east-2
 # Certs, secrets, and other properties for saml sp service or mod-shib plugin
 # AWS_PROFILE="bu"
 HOST_NAME="dev.kualitest.research.bu.edu"
-SP_PORT=5000
+DOCKER_SP_PORT=5000
 ENTITY_ID="https://*.kualitest.research.bu.edu/shibboleth"
 IDP_ENTITY_ID="https://shib-test.bu.edu/idp/shibboleth"
 IDP_CERT=[idp certificate, get from IDP_ENTITY_ID URL]

@@ -135,7 +135,7 @@ In the build arguments and environment sections of the`"build.yml"` file, are de
         -f master.yml \
         -f wordpress-baseline/baseline.yml \
         -f wordpress-bu/wp-build/build.yml \
-        up
+        up -d
       ```
 
       

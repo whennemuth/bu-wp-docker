@@ -30,7 +30,13 @@ services:
         MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
         REPOS: ${REPOS}
     environment:
-      # "S3_" prefixed variables assume that s3proxy.yml will be merged using the -f flag
+      # NOTE:
+      #    1) "S3_" prefixed variables assume that s3proxy.yml will be merged using the -f flag
+      #    2) We want changes in the WP_CONFIG_EXTRA to be reflected every time the container is started.
+      #       So, you must delete /var/www/html/wp-config.php from the volume, otherwise you will see the following warning:
+      #       "WARNING: environment variable "WORDPRESS_CONFIG_EXTRA" is set, but "wp-config.php" already exists
+      #        The contents of this variable will _not_ be inserted into the existing "wp-config.php" file.
+      #        (see https://github.com/docker-library/wordpress/issues/333⁠ for more details)"
       WORDPRESS_CONFIG_EXTRA: |
         define('MULTISITE', true);
         define('SUBDOMAIN_INSTALL', false);

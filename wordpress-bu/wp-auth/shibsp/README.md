@@ -44,7 +44,7 @@ This [compose application model](https://docs.docker.com/compose/intro/compose-a
 
 2. The following variables are defined in the environment for `shibsp.yml`. Adjust these where necessary. Some of them extract values *(or default values)* from the shell that docker compose is running in and originate from the [`.env`](https://docs.docker.com/compose/environment-variables/set-environment-variables/#substitute-with-an-env-file) file at the root of the project.
 
-   - **EXPRESS_PORT**: This is the port the `shibsp` container will listen on *(default 5000).*
+   - **DOCKER_SP_PORT**: This is the port the `shibsp` container will listen on *(default 5000).*
 
    - **ENTITY_ID**: The SP identifier known to the IDP *(Example:  https://.kualitest.research.bu.edu/shibboleth")*.
 
@@ -58,7 +58,7 @@ This [compose application model](https://docs.docker.com/compose/intro/compose-a
 
    - **SAML_PK**: The private key item of your service provider metadata. This is the private part of the public/private key pair used when your app was registered with the IDP - the private part being kept securely by you.
 
-   - **APP_HOST**: The host name the WordPress container will be visible to the `shibsp` container as over the docker network bridge. Unless explicitly overridden, this will be the name of the service defined in the docker compose file *(Example: "wordpress")*.
+   - **DOCKER_APP_HOST**: The host name the WordPress container will be visible to the `shibsp` container as over the docker network bridge. Unless explicitly overridden, this will be the name of the service defined in the docker compose file *(Example: "wordpress")*.
 
 
 
