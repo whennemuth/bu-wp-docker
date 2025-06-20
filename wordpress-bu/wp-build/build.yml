@@ -18,7 +18,7 @@ x-description: |
 services:
 
   wordpress:
-    image: ${DOCKER_REGISTRY}/${DOCKER_REPO:-bu-wordpress-build}:${DOCKER_TAG:-latest}
+    image: ${DOCKER_REGISTRY}/${DOCKER_WORDPRESS_REPO:-bu-wordpress-build}:${DOCKER_WORDPRESS_TAG:-latest}
     restart: no
     build: 
       # Make relative to the project root set by master.yml
@@ -43,4 +43,3 @@ services:
         define( 'S3_UPLOADS_AUTOENABLE', true );
         define( 'S3_UPLOADS_DISABLE_REPLACE_UPLOAD_URL', true);
         define( 'BU_INCLUDES_PATH', '/var/www/html/bu-includes' );
-
