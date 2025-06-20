@@ -1,0 +1,22 @@
+name: shibsp-debug
+
+x-description: |
+  This Docker Compose file defines a Shibboleth Service Provider (SP) service in debug mode.
+  It is intended to be used for step debugging purposes and should be merged with the main
+  shibsp.yml file to layer on top the 9229 debug attach port. run:
+
+  docker compose \
+    -f master.yml \
+    -f wordpress-baseline/baseline.yml \
+    -f wordpress-bu/wp-build/build.yml \
+    -f wordpress-bu/wp-auth/shibsp/shibsp.yml \
+    -f wordpress-bu/wp-auth/shibsp/debug/shibsp-debug.yml \
+    config|up
+
+services:
+
+  shibsp:
+    image: ${DOCKER_REGISTRY}/bu-shibboleth-sp-debug
+    command: [ "dist/esm/EntrypointSp.js" ]
+    ports:
+      - '9229:9229'
