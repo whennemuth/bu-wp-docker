@@ -15,9 +15,41 @@ x-description: |
     -f wordpress-baseline/baseline.yml \
     -f wordpress-bu/wp-build/build.yml \
     -f wordpress-bu/wp-auth/shibsp/shibsp.yml \
-    config|build|up
+    config|up
 
 services:
+
+  wordpress:
+    # Set the port, host, and protocol that WordPress applies to the same as the SP service that proxies to it.
+    environment:
+      # Define extra WordPress configuration for reverse proxy support
+      WORDPRESS_CONFIG_EXTRA_2: |
+        $$host = getenv('HOST_NAME');
+        $$port = getenv('DOCKER_SP_PORT');
+        $$proxy_extras = getenv('DOCKER_SP_PROXY_EXTRAS') === 'true' ? 'true' : 'false';
+        $$port_suffix = in_array($$port, ['80', '443']) ? '' : ":$$port";
+        $$protocol = ($$_SERVER['HTTP_X_FORWARDED_PROTO'] ?? 'http') === 'https' ? 'https' : 'http';
+        if(!empty($$port) && $$proxy_extras === 'true') {
+          // The proxy will always be running with https
+          $$protocol = 'https';
+        }
+
+        // Primary domain (no port)
+        define('DOMAIN_CURRENT_SITE', $$host);
+        // https://core.trac.wordpress.org/attachment/ticket/21077/multisite-custom-port.patch
+        if (!empty($$port_suffix)) {
+          define('WP_CUSTOM_PORT', $$port);
+        }
+
+        // Full URL with port if non-standard
+        define('WP_HOME', "{$$protocol}://{$$host}{$$port_suffix}");
+        define('WP_SITEURL', WP_HOME);
+        define('WP_ADMIN_URL', WP_HOME.'/wp-admin');
+    # Because this service is now only accessed via the shibsp service over the wp-bridge network,
+    # merely expose the same ports (to the docker network) and unbind them from the host.
+    expose:
+      - 80
+    ports: !reset []
 
   shibsp:
     image: ${DOCKER_REGISTRY}/bu-shibboleth-sp 
