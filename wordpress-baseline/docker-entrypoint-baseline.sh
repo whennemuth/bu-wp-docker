@@ -16,13 +16,32 @@ uninitialized_baseline() {
   [ -n "$(grep 'localhost' $WORDPRESS_CONF)" ] && true || false
 }
 
+# Get the URL for the WP-CLI commands that reflects how wp-config.php has configured the site.
+get_wp_cli_url() {
+  # Check for local running and possible reverse proxy.
+  local protocol="http";
+  local port="$DOCKER_SP_PORT"
+  if [[ -n "$DOCKER_SP_PORT" && "$DOCKER_SP_PROXY_EXTRAS" == "true" ]] ; then
+    # The proxy will always be running over https
+    protocol="https";
+    [ "$port" -eq "443" ] && port=""
+    [ "$port" -eq "80" ] && port=""
+    [ -n "$port" ] && port=":$port"
+  else
+    port=""
+  fi    
+  echo -n "${protocol}://${SERVER_NAME}${port}"
+}
+
 MU_PLUGIN_LOADER='/var/www/html/wp-content/mu-plugins/loader.php'
 check_mu_plugin_loader() {
   if [ -f $MU_PLUGIN_LOADER ] ; then
     echo "mu_plugin_loader already generated..."
   else
-    echo "generate_mu_plugin_loader..."
+    local url="$(get_wp_cli_url)"
+    echo "generate_mu_plugin_loader for $url ..."
     wp bu-core generate-mu-plugin-loader \
+      --url="$url" \
       --path=/var/www/html \
       --require=/var/www/html/wp-content/mu-plugins/bu-core/src/wp-cli.php 2>&1 || true
   fi
@@ -31,12 +50,17 @@ check_mu_plugin_loader() {
 check_wordpress_install() {
 
   if ! wp core is-installed 2> /dev/null; then
+
     # WP is not installed. Let's try installing it.
-    echo "installing multisite..."
+    local url="$(get_wp_cli_url)"
+    echo "installing multisite for $url ..."
     wp core multisite-install --title="local root site" \
-      --url="http://$SERVER_NAME" \
+      --url="$url" \
       --admin_user="admin" \
-      --admin_email="no-use-admin@bu.edu" 2>&1 || true
+      --admin_email="no-use-admin@bu.edu" \
+      --skip-email 2>&1 || true
+
+    wp --url="$url" option get siteurl
 
     else
       # WP is already installed.
