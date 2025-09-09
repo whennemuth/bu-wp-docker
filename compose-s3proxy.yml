@@ -49,6 +49,15 @@ services:
     networks:
       wp-bridge:
 
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    networks:
+      wp-bridge:
+
   wordpress:
     extends:
       file: docker-compose.yml
@@ -56,6 +65,8 @@ services:
     restart: no
     environment:
       S3PROXY_HOST: http://s3proxy:8080
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       # SHELL: true
 
 networks:
