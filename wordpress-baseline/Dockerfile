@@ -3,6 +3,10 @@ FROM wordpress:5.4.2-php7.4-apache
 # Set ARG for architecture
 ARG TARGETARCH
 
+# Workaround for EOL Debian buster repositories, remove when running on a newer supported image
+RUN sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g; s|security.debian.org/debian-security|archive.debian.org/debian-security|g' /etc/apt/sources.list && \
+  echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+
 # Client utils & tools
 RUN \
   apt update && apt upgrade; \
