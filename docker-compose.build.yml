@@ -9,7 +9,6 @@ services:
       context: .
       dockerfile: wordpress-build/Dockerfile
       args:
-        TARGETARCH: ${TARGETARCH:-amd64}
         GIT_USER: ${GIT_USER}
         GIT_PAT: ${GIT_PAT}
         MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
