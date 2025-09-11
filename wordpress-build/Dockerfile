@@ -1,31 +1,10 @@
-# BU WordPress - Combined Multi-Stage Build
-# This Dockerfile combines both baseline and build stages into a single definition
+# BU WordPress - Optimized Multi-Stage Build
+# This Dockerfile uses three stages to maximize build cache efficiency
 
 # -----------------------------------------------------------
-#            STAGE 1: WordPress Code Acquisition
+#       STAGE 1: System Base (Rarely Changes)
 # -----------------------------------------------------------
-FROM debian:12-slim AS wp-code-builder
-
-ARG GIT_USER
-ARG GIT_PAT
-ARG MANIFEST_INI_FILE
-ARG REPOS
-ARG CACHEBUST=1
-
-# Install dependencies for WordPress code acquisition
-RUN apt update -y && \
-    apt upgrade -y && \
-    apt install git wget dos2unix xxd -y && \
-    mkdir -p /tmp/repos
-
-# Copy and run build script
-COPY wordpress-build/wp-build.sh /usr/local/bin/
-RUN bash /usr/local/bin/wp-build.sh 2>&1 | tee /tmp/repos/build-output.txt
-
-# -----------------------------------------------------------
-#            STAGE 2: Final WordPress Image
-# -----------------------------------------------------------
-FROM wordpress:5.7.2-php7.4-apache
+FROM wordpress:5.7.2-php7.4-apache AS wordpress-system
 
 # Set ARG for architecture
 ARG TARGETARCH
@@ -52,6 +31,7 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     fi && \
     unzip -q awscliv2.zip && \
     ./aws/install && \
+    aws --version && \
     rm awscliv2.zip && rm -rf aws/
 
 # Install Igbinary extension
@@ -76,7 +56,7 @@ RUN apt-get -y install libapache2-mod-shib && \
     apache2ctl -M | grep mod_shib && \
     a2enmod auth_basic headers rewrite ssl remoteip proxy proxy_http env shib
 
-# Copy configuration files from baseline
+# Copy static configuration files from baseline
 COPY wordpress-baseline/shibboleth2-template.xml /etc/shibboleth/
 COPY wordpress-baseline/attribute-map.xml /etc/shibboleth/
 COPY wordpress-baseline/docker-entrypoint-baseline.sh /usr/local/bin/
@@ -91,14 +71,47 @@ COPY wordpress-baseline/_s3proxy-custom-errors /var/www/html/_s3proxy-custom-err
 COPY wordpress-baseline/.htaccess /var/www/html/
 COPY wordpress-baseline/uploads.ini /usr/local/etc/php/conf.d/
 
-# Copy WordPress code from builder stage
-COPY --from=wp-code-builder /tmp/repos/ /usr/src/wordpress/
-
-# Add build entrypoint and S3 proxy configuration
-COPY wordpress-build/docker-entrypoint-build.sh /usr/local/bin/
+# Add S3 proxy configuration
 COPY wordpress-build/s3proxy.conf /etc/apache2/sites-available/
 
-# Configure entrypoint script
-RUN sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh && \
-    sed -i "/exec "$@"/i\source docker-entrypoint-build.sh \$@" /usr/local/bin/docker-entrypoint.sh
+# Configure entrypoint script base
+RUN sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh
 
+# -----------------------------------------------------------
+#       STAGE 2: WordPress Code (Changes Frequently)
+# -----------------------------------------------------------
+FROM debian:12-slim AS wp-code-builder
+
+ARG GIT_USER
+ARG GIT_PAT
+ARG MANIFEST_INI_FILE
+ARG REPOS
+ARG CACHEBUST=1
+
+# Add cachebust argument to force rebuild when needed
+# This line changes with every build when CACHEBUST is modified
+RUN echo "Cache bust: $CACHEBUST"
+
+# Install dependencies for WordPress code acquisition
+RUN apt update -y && \
+    apt upgrade -y && \
+    apt install git wget dos2unix xxd -y && \
+    mkdir -p /tmp/repos
+
+# Copy and run build script
+COPY wordpress-build/wp-build.sh /usr/local/bin/
+RUN bash /usr/local/bin/wp-build.sh 2>&1 | tee /tmp/repos/build-output.txt
+
+# -----------------------------------------------------------
+#       STAGE 3: Final Assembly (Quick)
+# -----------------------------------------------------------
+FROM wordpress-system AS final
+
+# Copy WordPress code from code builder stage
+COPY --from=wp-code-builder /tmp/repos/ /usr/src/wordpress/
+
+# Add build entrypoint
+COPY wordpress-build/docker-entrypoint-build.sh /usr/local/bin/
+
+# Append to the entrypoint script (already modified in base stage)
+RUN sed -i "/exec "$@"/i\source docker-entrypoint-build.sh \$@" /usr/local/bin/docker-entrypoint.sh
