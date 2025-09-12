@@ -10,6 +10,7 @@ FROM wordpress:5.7.2-php7.4-apache AS wordpress-system
 ARG TARGETARCH
 
 # Workaround for EOL Debian repositories
+# Remove when running on a newer supported image
 RUN sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g; s|security.debian.org/debian-security|archive.debian.org/debian-security|g' /etc/apt/sources.list && \
     echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
 
