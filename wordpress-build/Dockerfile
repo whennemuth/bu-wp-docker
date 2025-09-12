@@ -80,7 +80,7 @@ RUN sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bi
 # -----------------------------------------------------------
 #       STAGE 2: WordPress Code (Changes Frequently)
 # -----------------------------------------------------------
-FROM debian:12-slim AS wp-code-builder
+FROM debian:13-slim AS wp-code-builder
 
 ARG GIT_USER
 ARG GIT_PAT
