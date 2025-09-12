@@ -41,7 +41,7 @@ services:
       SHIB_IDP_LOGOUT: ${SHIB_IDP_LOGOUT:-https://shib-test.bu.edu/idp/logout.jsp}
       SHIB_SP_KEY: ${SHIB_SP_KEY}
       SHIB_SP_CERT: ${SHIB_SP_CERT}
-      S3PROXY_HOST: http://s3proxy:8080/
+      S3PROXY_HOST: http://s3proxy:8080
       FORWARDED_FOR_HOST: ${FORWARDED_FOR_HOST:-localhost}
       REDIS_HOST: redis
       REDIS_PORT: 6379
