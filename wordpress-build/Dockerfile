@@ -55,7 +55,7 @@ RUN cd /tmp && \
 # Install and configure Shibboleth
 RUN apt-get -y install libapache2-mod-shib && \
     apache2ctl -M | grep mod_shib && \
-    a2enmod auth_basic headers rewrite ssl remoteip proxy proxy_http env shib
+    a2enmod auth_basic headers rewrite ssl proxy proxy_http env shib
 
 # Copy static configuration files from baseline
 COPY wordpress-baseline/shibboleth2-template.xml /etc/shibboleth/
