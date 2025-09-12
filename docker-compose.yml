@@ -75,7 +75,7 @@ services:
       - "${OLAP_REGION:-us-east-1}"
       - "--no-verify-ssl"
       - "--host"
-      - "${OLAP:-olap}-${OLAP_ACCT_NBR:-123456789}.s3-object-lambda.${OLAP_REGION:-us-east-1}.amazonaws.com"
+      - "${OLAP}-${OLAP_ACCT_NBR}.s3-object-lambda.${OLAP_REGION:-us-east-1}.amazonaws.com"
     environment:
       healthcheck_path: '/s3proxy-healthcheck'
       AWS_ACCESS_KEY_ID: ${S3_UPLOADS_ACCESS_KEY_ID}
