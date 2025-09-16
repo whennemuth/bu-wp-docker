@@ -47,14 +47,21 @@ At this point you can check the logs on the WordPress container and see how the 
 
 ## Setup admin and content
 
-- Get a shell on the wordpress container (`npm run shell`) and create an admin user like so (replace "username" with your username):
+- Get a shell on the wordpress container:
+    ```bash
+    npm run shell
+    ```
+- You can create a new user for yourself just by going the wp-admin page of your local site, you will be prompted to login with BU shibboleth, and then a user will be created for you automatically. You can also create a user manually like so (replace "username" and "username@bu.edu" with your login details):
     ```bash
     wp user create username username@bu.edu --role=administrator
+    ```
+- You can then make yourself a super admin like so (replace "username" with your username):
+    ```bash
     wp super-admin add username@bu.edu
     ```
     Once you have created the user, you can log in to the WordPress admin at https://username.local/wp-admin
 
-- Optional: Clone the admissions site to your local instance (replace "username" with your username):
+- Optional: Clone the admissions site to your local instance (replace "username.local" with your local hostname):
     ```bash
     wp site-manager snapshot-pull --source=http://www.bu.edu/admissions --destination=http://username.local/admissions
     ```
