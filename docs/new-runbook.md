@@ -43,6 +43,8 @@ Your WordPress site will be available at https://username.local (or whatever hos
 
 The https is set up with a self-signed certificate for local development, you will need to override the browser warning.
 
+At this point you can check the logs on the WordPress container and see how the entrypoint script initializes the configuration details in the container.
+
 ## Setup admin and content
 
 - Get a shell on the wordpress container (`npm run shell`) and create an admin user like so (replace "username" with your username):
@@ -66,3 +68,16 @@ That's it you are done!
 - Go to the Containers view
 - Right-click the bu-wordpress container
 - Choose "Attach Visual Studio Code"
+
+### Stop the containers
+
+```bash
+npm run stop
+```
+or click the stop button in the NPM Scripts tab in VSCode.
+
+### Destroy the database and start fresh
+
+```bash
+docker volume rm bu-wp-docker_db_data
+```
