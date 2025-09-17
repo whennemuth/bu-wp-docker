@@ -153,6 +153,10 @@ else
 
   setup_redis
 
+  ## XDebug should not be enabled in production environments.
+  ## It is only intended for local development environments.
+  setup_xdebug
+
   if uninitialized_baseline ; then
 
     if [ -n "$SHIB_PK_AND_CERT_PROVIDED" ] ; then
