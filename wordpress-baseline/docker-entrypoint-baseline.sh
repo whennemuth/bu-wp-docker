@@ -127,6 +127,20 @@ includeShibbolethConfig() {
   sed -i 's|# SHIBBOLETH_PLACEHOLDER|Include '${SHIBBOLETH_CONF}'|' $WORDPRESS_CONF
 }
 
+# Setup xdebug if the XDEBUG environment variable is set to 'true'.
+# This is currently customized for use with local docker and may be macOS specific.
+setup_xdebug() {
+  if [ "$XDEBUG" == 'true' ] ; then
+    if [ -z "$(pecl list | grep xdebug-3.1.6)" ] ; then
+      pecl install xdebug-3.1.6
+    fi
+    docker-php-ext-enable xdebug
+    echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
+    echo 'xdebug.mode=debug' >> /usr/local/etc/php/php.ini
+    echo 'xdebug.client_host="host.docker.internal"' >> /usr/local/etc/php/php.ini
+  fi
+}
+
 
 if [ "$SHELL" == 'true' ] ; then
   # Keeps the container running, but apache is not started.

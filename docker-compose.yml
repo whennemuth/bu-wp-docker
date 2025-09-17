@@ -47,6 +47,7 @@ services:
       REDIS_PORT: 6379
       TZ: America/New_York
       MULTISITE: true
+      XDEBUG: ${XDEBUG:-false}
       WP_CLI_ALLOW_ROOT: true
       # S3 WordPress config
       WORDPRESS_CONFIG_EXTRA: |
