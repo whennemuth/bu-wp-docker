@@ -73,7 +73,7 @@ COPY wordpress-baseline/.htaccess /var/www/html/
 COPY wordpress-baseline/uploads.ini /usr/local/etc/php/conf.d/
 
 # Add S3 proxy configuration
-COPY wordpress-build/s3proxy.conf /etc/apache2/sites-available/
+COPY wordpress-baseline/s3proxy.conf /etc/apache2/sites-available/
 
 # Configure entrypoint script base
 RUN sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh
@@ -111,8 +111,4 @@ FROM wordpress-system AS final
 # Copy WordPress code from code builder stage
 COPY --from=wp-code-builder /tmp/repos/ /usr/src/wordpress/
 
-# Add build entrypoint
-COPY wordpress-build/docker-entrypoint-build.sh /usr/local/bin/
-
-# Append to the entrypoint script (already modified in base stage)
-RUN sed -i "/exec "$@"/i\source docker-entrypoint-build.sh \$@" /usr/local/bin/docker-entrypoint.sh
+# No additional entrypoint needed - S3 proxy setup is now integrated into the baseline entrypoint

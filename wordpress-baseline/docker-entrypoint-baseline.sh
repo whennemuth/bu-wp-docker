@@ -8,6 +8,7 @@ fi
 
 WORDPRESS_CONF='/etc/apache2/sites-enabled/wordpress.conf'
 SHIBBOLETH_CONF='/etc/apache2/sites-available/shibboleth.conf'
+S3PROXY_CONF='/etc/apache2/sites-available/s3proxy.conf'
 
 # Paves over the shibboleth.xml file with a copy of the shibboleth2-template.xml file with the placeholder
 # values replaced with the real values that should be available now as environment variables.
@@ -127,6 +128,19 @@ includeShibbolethConfig() {
   sed -i 's|# SHIBBOLETH_PLACEHOLDER|Include '${SHIBBOLETH_CONF}'|' $WORDPRESS_CONF
 }
 
+# Replace a placeholder in s3proxy.conf with the actual s3proxy host value.
+setS3ProxyHost() {
+  echo "setS3ProxyHost..."
+  sed -i 's|S3PROXY_HOST_PLACEHOLDER|'$S3PROXY_HOST'|g' $S3PROXY_CONF
+}
+
+# Append an include statement for s3proxy.conf as a new line in wordpress.conf directly below a placeholder.
+includeS3ProxyConfig() {
+  echo "includeS3ProxyConfig..."
+  sed -i 's|# PROXY_PLACEHOLDER|Include '${S3PROXY_CONF}'|' $WORDPRESS_CONF
+}
+
+
 # Setup xdebug if the XDEBUG environment variable is set to 'true'.
 # This is currently customized for use with local docker and may be macOS specific.
 setup_xdebug() {
@@ -152,6 +166,13 @@ else
   check_mu_plugin_loader
 
   setup_redis
+
+  # Configure S3 proxy if the config values are provided (assumes that if the bucket name is provided, the other config values are as well).
+  if [ -n "${S3PROXY_HOST}" ]; then
+    setS3ProxyHost
+
+    includeS3ProxyConfig
+  fi
 
   ## XDebug should not be enabled in production environments.
   ## It is only intended for local development environments.
