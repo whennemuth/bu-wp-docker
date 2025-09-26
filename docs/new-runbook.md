@@ -39,6 +39,9 @@ npm run start
 ```
 or click the start button in the NPM Scripts tab in VSCode.
 
+( Check out this article on the NPM Scripts tab in VSCode:
+https://www.luisllamas.es/en/how-to-use-vscode-with-npm/ )
+
 Your WordPress site will be available at https://username.local (or whatever hostname you set in the .env file and /etc/hosts).
 
 The https is set up with a self-signed certificate for local development, you will need to override the browser warning.
