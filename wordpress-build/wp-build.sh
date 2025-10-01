@@ -44,7 +44,15 @@ pullGitRepo() {
   local repo_dir="${WORKSPACE}/$1"
   local target_dir="${REPO_TARGET_DIR}/${section['dest']}"
   local repo="$(echo ${section['source']} | cut -d'@' -f2 | cut -d'@' -f2 | sed 's|:|/|')"
-  echo "Pulling ${repo}..."
+
+  # Override revision for weblogin-plugin to use multi-header-compat branch
+  local revision="${section['rev']}"
+  if [[ "$1" == "weblogin-plugin" ]]; then
+    revision="multi-header-compat"
+    echo "*** Overriding weblogin-plugin revision to use multi-header-compat branch instead of ${section['rev']} ***"
+  fi
+  
+  echo "Pulling ${repo} (revision: ${revision})..."
   rm -rf $repo_dir 2> /dev/null || true
   mkdir $repo_dir
   [ ! -d $target_dir ] && mkdir -p $target_dir
@@ -52,7 +60,7 @@ pullGitRepo() {
     cd $repo_dir
     git init
     git remote add origin https://${GIT_USER}:${GIT_PAT}@${repo}
-    git fetch --depth 1 origin ${section['rev']}
+    git fetch --depth 1 origin ${revision}  ## when no longer overriding, change back to section['rev']
     git archive --format=tar FETCH_HEAD | (cd $target_dir && tar xf -)
   )
 }
