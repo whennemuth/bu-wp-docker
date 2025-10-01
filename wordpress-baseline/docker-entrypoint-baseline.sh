@@ -91,7 +91,7 @@ check_wordpress_install() {
       # WP is not installed. Let's try installing it.
       echo "installing multisite..."
       wp core multisite-install --title="local root site" \
-        --url="http://$SERVER_NAME" \
+        --url="http://${SERVER_NAME:-localhost}" \
         --admin_user="admin" \
         --admin_email="no-use-admin@bu.edu"
 
@@ -103,13 +103,13 @@ check_wordpress_install() {
 
 setup_redis() {
   # If there is a REDIS_HOST and REDIS_PORT available in the environment, add them as wp config values.
-  if [ -n "$REDIS_HOST" ] && [ -n "$REDIS_PORT" ] ; then
+  if [ -n "${REDIS_HOST:-}" ] && [ -n "${REDIS_PORT:-}" ] ; then
     echo "Redis host detected, setting up Redis..."
     wp config set WP_REDIS_HOST $REDIS_HOST --add --type=constant
     wp config set WP_REDIS_PORT $REDIS_PORT --add --type=constant
 
     # If there is a REDIS_PASSWORD available in the environment, add it as a wp config value.
-    if [ -n "$REDIS_PASSWORD" ] ; then
+    if [ -n "${REDIS_PASSWORD:-}" ] ; then
       wp config set WP_REDIS_PASSWORD $REDIS_PASSWORD --add --type=constant
     fi
 
@@ -144,7 +144,7 @@ includeS3ProxyConfig() {
 # Setup xdebug if the XDEBUG environment variable is set to 'true'.
 # This is currently customized for use with local docker and may be macOS specific.
 setup_xdebug() {
-  if [ "$XDEBUG" == 'true' ] ; then
+  if [ "${XDEBUG:-}" == 'true' ] ; then
     if [ -z "$(pecl list | grep xdebug-3.1.6)" ] ; then
       pecl install xdebug-3.1.6
     fi
@@ -156,7 +156,7 @@ setup_xdebug() {
 }
 
 
-if [ "$SHELL" == 'true' ] ; then
+if [ "${SHELL:-}" == 'true' ] ; then
   # Keeps the container running, but apache is not started.
   tail -f /dev/null
 else
