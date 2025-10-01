@@ -52,18 +52,10 @@ RUN cd /tmp && \
     ./configure --enable-redis-igbinary && \
     make && make install
 
-# Install and configure Shibboleth
-RUN apt-get -y install libapache2-mod-shib && \
-    apache2ctl -M | grep mod_shib && \
-    a2enmod auth_basic headers rewrite ssl proxy proxy_http env shib
+RUN a2enmod auth_basic headers rewrite ssl proxy proxy_http env
 
-# Copy static configuration files from baseline
-COPY --chmod=766 wordpress-baseline/shibboleth2-template.xml /etc/shibboleth/
-COPY --chmod=766 wordpress-baseline/attribute-map.xml /etc/shibboleth/
 COPY --chmod=777 wordpress-baseline/docker-entrypoint-baseline.sh /usr/local/bin/
 COPY wordpress-baseline/wordpress.conf /etc/apache2/sites-enabled/
-COPY wordpress-baseline/shibboleth.conf /etc/apache2/sites-available/
-COPY wordpress-baseline/shib.conf /etc/apache2/conf-available/
 COPY wordpress-baseline/healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 
