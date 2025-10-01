@@ -18,7 +18,8 @@ services:
       - wp-network
 
   wordpress:
-    image: ${DOCKER_REGISTRY:-local}/bu-wordpress:${TAG:-latest}
+    # If DOCKER_REGISTRY is set, pull the image from there; otherwise, use the locally built image
+    image: ${DOCKER_REGISTRY:+$DOCKER_REGISTRY/}bu-wordpress:${TAG:-latest}
     depends_on:
       - db
       - s3proxy

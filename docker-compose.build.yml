@@ -14,4 +14,4 @@ services:
         MANIFEST_INI_FILE: ${MANIFEST_INI_FILE}
         REPOS: ${REPOS}
         CACHEBUST: ${CACHEBUST:-1}
-    image: ${DOCKER_REGISTRY:-local}/bu-wordpress:${TAG:-latest}
+    image: bu-wordpress:${TAG:-latest}
