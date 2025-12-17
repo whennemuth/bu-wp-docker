@@ -1,0 +1,23 @@
+name: master
+
+x-description: |
+  This master.yml file is brought in for navigating a subtle behavior of Docker Compose when merging with
+  multiple compose files specified with the -f flag. When using multiple Compose files, Docker Compose merges 
+  them together to create a single configuration.
+  Because Docker Compose resolves relative paths (like build.context) at parse time, and only once, this means:
+    1) The first Compose file determines the "parse context"
+    2) All subsequent files' build.context fields, if relative, must be relative to that first file
+  This solution ensures that even nested Compose files resolve their context relative to the project root — 
+  and only giving up the ability to call docker compose directly from inside subdirectories in order to retain 
+  a clean, structured hierarchy. This is not just overriding — it is rerouting how Docker Compose perceives 
+  relative paths by anchoring all subsequent parsing to a known location.
+  What this achieves is the ability to maintain a deep directory structure for the project, while still allowing
+  for the merging and overriding behavior sought without the problems encountered with use of 
+  "extends", "include", anchors with fragments, etc., where compose files are not all in the same directory and
+  use relative paths.
+
+services:
+
+  wordpress:
+    build:
+      context: . 

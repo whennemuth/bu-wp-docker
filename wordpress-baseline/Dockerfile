@@ -43,19 +43,13 @@ RUN \
   ./configure --enable-redis-igbinary; \
   make && make install;
 
-# Shibboleth
+# Modules
 #   1) Install and enable modules
 RUN \
-  apt-get -y install libapache2-mod-shib && \
-  apache2ctl -M | grep mod_shib && \
-  a2enmod auth_basic headers rewrite ssl proxy proxy_http env shib
+  a2enmod auth_basic headers rewrite ssl proxy proxy_http env
 #   2) Copy and adjust files
-COPY --chmod=766 shibboleth2-template.xml /etc/shibboleth/
-COPY --chmod=766 attribute-map.xml /etc/shibboleth/
 COPY --chmod=777 docker-entrypoint-baseline.sh /usr/local/bin/
 COPY --chmod=766 wordpress.conf /etc/apache2/sites-enabled/
-COPY --chmod=766 shibboleth.conf /etc/apache2/sites-available/
-COPY --chmod=766 shib.conf /etc/apache2/conf-available/
 COPY --chmod=700 healthcheck.htm /usr/src/wordpress/
 RUN rm /etc/apache2/sites-enabled/000-default.conf
 
@@ -68,6 +62,11 @@ COPY --chmod=766 .htaccess /var/www/html/
 # Expanded upload limits for php.ini
 COPY --chmod=766 uploads.ini /usr/local/etc/php/conf.d/
 
-# Extend the entrypoint script
+# Extend the entrypoint script by inserting a source command for the content of 
+# docker-entrypoint-baseline.sh directly below the line in the original script that reads "exec "$@""
 RUN \
   sed -i "/exec "$@"/i\source docker-entrypoint-baseline.sh \$@" /usr/local/bin/docker-entrypoint.sh
+
+# Add a "pre"-entrypoint script that runs first and then sources the main entrypoint script
+COPY --chmod=766 docker-pre-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-pre-entrypoint.sh"]

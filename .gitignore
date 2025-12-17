@@ -1,2 +1,6 @@
 .env
+.env.*
 ./bu-wp-docker.code-workspace
+_logs
+_mount
+config-output.yml

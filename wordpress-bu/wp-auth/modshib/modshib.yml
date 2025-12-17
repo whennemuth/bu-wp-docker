@@ -1,0 +1,37 @@
+version: '3.9'
+
+name: modshib
+
+x-description: |
+  This Docker Compose file defines a Shibboleth Service Provider (SP) docker image build to:
+  1) "Mutate" the underlying WordPress docker image by installing the the Apache mod-shib plugin on top of it.
+  2) Merge extra environment variables on top of the WordPress service configuration for the mod-shib plugin.
+  From the project root, run:
+  docker compose \
+    -f master.yml \
+    -f wordpress-baseline/baseline.yml \
+    -f wordpress-bu/wp-build/build.yml \
+    -f wordpress-bu/wp-auth/modshib/modshib.yml \
+    config|build|up
+
+services:
+
+  wordpress:
+    image: ${DOCKER_REGISTRY}/bu-wordpress-modshib
+    build: 
+      # Make relative to the project root set by master.yml
+      context: wordpress-bu/wp-auth/modshib/
+      args:
+        # Define the component parts of the FROM Dockerfile instruction
+        DOCKER_REGISTRY: ${DOCKER_REGISTRY}
+        DOCKER_WORDPRESS_REPO: ${DOCKER_WORDPRESS_REPO:-bu-wordpress-build}
+        DOCKER_WORDPRESS_TAG: ${DOCKER_WORDPRESS_TAG:-latest}
+    environment:
+      HTTP_HOST: ${HOST_NAME}
+      SP_ENTITY_ID: ${ENTITY_ID}
+      IDP_ENTITY_ID: ${IDP_ENTITY_ID}
+      SHIB_IDP_LOGOUT: ${LOGOUT_URL}
+      SHIB_SP_KEY: ${SAML_PK}
+      SHIB_SP_CERT: ${SAML_CERT}
+    volumes:
+      - ./_logs/logs-shib:/var/log/shibboleth

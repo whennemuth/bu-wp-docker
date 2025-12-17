@@ -1,0 +1,45 @@
+version: '3.9'
+
+name: s3proxy
+
+x-description: |
+  Defined here is an S3 proxy service. This allows the Wordpress application to interact with AWS S3 using the 
+  AWS Signature Version 4 signing process. It tacks on a few additional environment configurations for the 
+  `wordpress` service, and defines a new `s3proxy` service.
+  NOTE: Intended to be used by merging with another Docker Compose file, and NOT run on its own. Example:
+
+    docker-compose \
+      -f some_other_compose_file(s).yml \
+      -f wordpress-bu/wp-s3proxy/s3proxy.yml \
+      config|up
+
+services:
+
+  wordpress:
+    environment:
+      S3PROXY_HOST: http://s3proxy:8080/
+      FORWARDED_FOR_HOST: jaydub-bulb.cms-devl.bu.edu
+      MULTISITE: false
+
+  s3proxy:
+    image: public.ecr.aws/bostonuniversity-nonprod/aws-sigv4-proxy
+    container_name: s3proxy
+    restart: always
+    ports:
+      - '8080:8080'
+    command: 
+      - "-v"
+      - "--name"
+      - "s3-object-lambda"
+      - "--region"
+      - "${OLAP_REGION}"
+      - "--no-verify-ssl"
+      - "--host"
+      - "${OLAP}-${OLAP_ACCT_NBR}.s3-object-lambda.${OLAP_REGION}.amazonaws.com"
+    environment:
+      healthcheck_path: '/s3proxy-healthcheck'
+      AWS_ACCESS_KEY_ID: ${S3_UPLOADS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${S3_UPLOADS_SECRET_ACCESS_KEY}
+      REGION: ${S3_UPLOADS_REGION}
+    networks:
+      wp-bridge:

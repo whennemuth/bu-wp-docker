@@ -1,8 +1,0 @@
-logs
-logs/*
-output.log
-*.pem
-docker-entrypoint.sh
-logs-*
-sandbox
-sandbox/*

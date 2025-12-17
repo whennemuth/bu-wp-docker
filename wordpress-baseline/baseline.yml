@@ -1,0 +1,76 @@
+version: '3.9'
+
+name: baseline
+
+x-description: |
+  This Docker Compose file defines the non-BU specific baseline application model for Wordpress.
+  It sets up a MariaDB database and a WordPress service, both of which are essential components of a standard
+  Wordpress application. Other Docker Compose files in this project may extend or merge the services defined 
+  in this file o add additional configurations or override certain settings.
+  Note: This file uses environment variables for certain settings, such as the database password. 
+  These should be set in your environment before running Docker Compose.
+
+  From the project root, run:
+  
+  docker compose \
+    -f master.yml \
+    -f wordpress-baseline/baseline.yml \
+    config|build|up
+
+services:
+
+  db:
+    image: mariadb:latest
+    restart: always
+    container_name: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-password}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+    networks:
+      wp-bridge:
+
+  wordpress:
+    env_file:
+      - .env
+    depends_on:
+      - db
+    build:
+      # Make relative to the project root set by master.yml
+      context: wordpress-baseline/
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: ${DOCKER_REGISTRY}/bu-wordpress-baseline
+    container_name: wordpress
+    restart: always
+    hostname: ${HOST_NAME:-dev.kualitest.research.bu.edu}
+    ports:
+      - '443:443'
+      - '80:80'
+    environment:
+      SERVER_NAME: ${HOST_NAME:-dev.kualitest.research.bu.edu}
+      TZ: ${TZ:-America/New_York}
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-"db:3306"}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:-"wordpress"}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:-password}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME:-"wordpress"}
+      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-"true"}
+      WP_CLI_ALLOW_ROOT: ${WP_CLI_ALLOW_ROOT:-"true"}
+    volumes:
+      - ./_logs/logs-apache:/var/log/apache2
+      - wp_html:/var/www/html/
+    networks:
+      wp-bridge:
+
+networks:
+  wp-bridge:
+    driver: bridge
+volumes:
+  db_data: {}
+  wp_html: {}

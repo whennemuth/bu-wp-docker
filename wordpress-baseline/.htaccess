@@ -13,5 +13,3 @@ RewriteRule ^([_0-9a-zA-Z-]+/)?(.*\.php)$ $2 [L]
 RewriteRule . index.php [L]
 
 RewriteRule ^(saml/) $1 [L]
-AuthType shibboleth
-Require shibboleth
